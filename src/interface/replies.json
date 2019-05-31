@@ -1,0 +1,20 @@
+{
+    "SERVICE": {
+        "start": {
+            "en": "Hello there!",
+            "ru": "Privet..."
+        },
+
+        "help": {
+            "en": "Contact @tgcode for more info.",
+            "ru": "tak davay pishi @tgcode esli est problemi chuvachello."
+        }
+    },
+
+    "ADMIN": {
+        "stats": {
+            "en": "here you go you creep: {}",
+            "ru": "tak vot tvoi statistiki: {}"
+        }
+    }
+}
