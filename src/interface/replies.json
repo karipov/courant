@@ -1,13 +1,20 @@
 {
+    "LANGS": ["en", "ru"],
+    "LANG_NAMES": ["English", "Русский"],
     "SERVICE": {
         "start": {
-            "en": "Hello there!",
-            "ru": "Privet..."
+            "en": "Hello there! Please select your language:",
+            "ru": "Privet... viberi svoy yazik:"
         },
 
         "help": {
             "en": "Contact @tgcode for more info.",
             "ru": "tak davay pishi @tgcode esli est problemi chuvachello."
+        },
+
+        "invited_by": {
+            "en": "You've been invited by user: {}",
+            "ru": "Vi prigrlasheni {}"
         }
     },
 
@@ -15,6 +22,19 @@
         "stats": {
             "en": "here you go you creep: {}",
             "ru": "tak vot tvoi statistiki: {}"
+        }
+    },
+
+    "FSM": {
+        "0": {
+            "en": "hello there! Please send me your preffered language"
+        },
+        "1": {
+            "en": "Cool! Now, you have 3 options to choose from:"
+        },
+
+        "2": {
+            "en": "Great choice! Here is the setup for {}."
         }
     }
 }
