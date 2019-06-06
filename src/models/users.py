@@ -6,7 +6,7 @@ import datetime
 
 class Settings(EmbeddedDocument):
     language = StringField(required=True)
-    fsm_state = IntField(required=True, default=0)
+    fsm_state = IntField(default=0)
 
 
 class User(Document):
@@ -20,3 +20,21 @@ class User(Document):
         'indexes': ['user_id'],
         'collection': 'users'
     }
+
+    @classmethod
+    def check_exists(cls, uid: int) -> bool:
+        """
+        Checks if the User with a certain uid already exists in the database
+
+        :param uid: which user id to check for
+        :return: whether the user exists or not
+        """
+        user = cls.objects(user_id=uid)
+
+        if not user:
+            return False
+        if len(user) > 1:
+            raise TypeError
+            return
+
+        return True
