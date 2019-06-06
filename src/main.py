@@ -9,12 +9,13 @@ from telegram.ext import Updater, CommandHandler
 
 # set some config files and define them as objects
 args = load(open(Path.cwd().joinpath('src/config.json')))
-updater = Updater(token=args['TOKEN'], use_context=True)
+updater = Updater(token=args['TELEGRAM']['token'], use_context=True)
 dispatcher = updater.dispatcher
 
-# add stuff to the dispathcer
-dispatcher.add_handler(CommandHandler('start', service.cmd_start))
+
+# add stuff to the dispatcher
 dispatcher.add_handler(CommandHandler('admin', admin.cmd_admin))
+dispatcher.add_handler(CommandHandler('start', service.cmd_start))
 
 # start polling
 logging.basicConfig(level=logging.INFO)
