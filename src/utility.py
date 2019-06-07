@@ -27,3 +27,21 @@ def gen_keyboard(label: list, data: list, width=2) -> InlineKeyboardMarkup:
     menu = [buttons[i:i + width] for i in range(0, len(buttons), width)]
 
     return InlineKeyboardMarkup(menu)
+
+
+def lang(lang: str, allowed: list, default='en') -> str:
+    """
+    Prunes the language_code from update object.
+
+    :param lang: the language_code string
+    :param allowed: the allowed language codes
+    :param default: the default language code
+    :return: the pruned language code
+    """
+    if lang is None:
+        return default
+
+    if lang not in allowed:
+        return default
+    else:
+        return lang
