@@ -5,7 +5,7 @@ from models import User, Settings
 import utility
 
 
-markup = utility.gen_keyboard(label=txt['LANG_NAMES'], data=txt['LANGS'])
+markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANGS'])
 
 
 def get_payload(text: str):
