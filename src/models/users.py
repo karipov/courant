@@ -68,3 +68,8 @@ class User(Document):
             return
 
         return True
+
+    @classmethod
+    def retrieve_total(cls) -> int:
+        """ Retrieves the total amount of users """
+        return cls.objects.count()
