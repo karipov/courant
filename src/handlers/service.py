@@ -1,3 +1,12 @@
+"""
+A module for handling "service" functionality, such as "help" and "start"
+commands - meaning most of the answers to these commands are static and
+do not comprise the main functionality of the program.
+
+Currently contains handlers for the following commands:
+- /start <PAYLOAD>
+"""
+
 from .shared import (
     txt
 )
@@ -22,9 +31,7 @@ def get_payload(text: str):
 
 
 def cmd_start(update, context):
-    """
-    Handler: command /start <PAYLOAD>
-    """
+    """ Handler: command /start <PAYLOAD> """
     uid = update.message.chat_id
     lang = utility.lang(update.message.from_user.language_code, txt['LANGS'])
     payload = get_payload(update.message.text)
@@ -54,4 +61,14 @@ def cmd_start(update, context):
     inviter.add_to_invited(uid)
     context.bot.send_message(
         uid, txt['SERVICE']['invited_by'][lang].format(payload)
+    )
+
+
+def cmd_help(update, context):
+    """ Handler: command /help"""
+    uid = update.message.chat_id
+    lang = utility.lang(update.message.from_user.language_code, txt['LANGS'])
+
+    context.bot.send_message(
+        uid, txt['SERVICE']['help'][lang]
     )
