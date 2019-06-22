@@ -18,9 +18,16 @@
         }
     },
 
+    "CALLBACK": {
+        "lang_select": {
+            "en": "Language set to English.",
+            "ru": "Postavili russkiy."
+        }
+    },
+
     "ADMIN": {
         "stats": {
-            "en": "here you go you creep: {}",
+            "en": "here you go you creep:\n- total users: {}",
             "ru": "tak vot tvoi statistiki: {}"
         }
     },
