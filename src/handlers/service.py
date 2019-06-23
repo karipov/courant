@@ -9,9 +9,7 @@ Currently contains handlers for the following commands:
 - /help
 """
 
-from .shared import (
-    txt, FSM
-)
+from .shared import txt, FSM
 from models import User, Settings
 import utility
 
@@ -53,10 +51,6 @@ def cmd_start(update, context):
         context.bot.delete_message(uid, update.message.message_id)
         return
 
-    # advance to the next fsm state
-    current_user.settings.fsm_state = FSM.ENTRY_TYPE.value
-    current_user.save()
-
     # worry about payloads and invites below:
     if not payload:
         context.bot.send_message(
@@ -90,7 +84,7 @@ def cmd_cancel(update, context):
     """ Handler: command /cancel """
     user = User.get_user(update.message.chat_id)
 
-    # reset user settings:
+    # reset user fsm_state:
     user.settings.fsm_state = FSM.START.value
     user.save()
 
