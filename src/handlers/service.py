@@ -1,14 +1,16 @@
 """
-A module for handling "service" functionality, such as "help" and "start"
+Handles "service" functionality, such as "help" and "start"
 commands - meaning most of the answers to these commands are static and
 do not comprise the main functionality of the program.
 
 Currently contains handlers for the following commands:
 - /start <PAYLOAD>
+- /cancel
+- /help
 """
 
 from .shared import (
-    txt
+    txt, FSM
 )
 from models import User, Settings
 import utility
@@ -33,19 +35,29 @@ def get_payload(text: str):
 def cmd_start(update, context):
     """ Handler: command /start <PAYLOAD> """
     uid = update.message.chat_id
+    # temporary language, until user selects via callback
     lang = utility.lang(update.message.from_user.language_code, txt['LANGS'])
     payload = get_payload(update.message.text)
 
-    print(f'uid {uid} - lang {lang} has been detected')
-
     # build account for a user if it doesn't exist
     if not User.check_exists(uid=uid):
-        print(f'user {uid} doesn\'t exist... building account')
         User(
             user_id=uid,
             settings=Settings(language=lang)
         ).save()
 
+    current_user = User.get_user(uid=uid)
+
+    # delete message if the user is in another FSM state
+    if not current_user.settings.fsm_state == FSM.START.value:
+        context.bot.delete_message(uid, update.message.message_id)
+        return
+
+    # advance to the next fsm state
+    current_user.settings.fsm_state = FSM.ENTRY_TYPE.value
+    current_user.save()
+
+    # worry about payloads and invites below:
     if not payload:
         context.bot.send_message(
             uid, txt['SERVICE']['start'][lang],
@@ -65,10 +77,23 @@ def cmd_start(update, context):
 
 
 def cmd_help(update, context):
-    """ Handler: command /help"""
+    """ Handler: command /help """
     uid = update.message.chat_id
     lang = utility.lang(update.message.from_user.language_code, txt['LANGS'])
 
     context.bot.send_message(
         uid, txt['SERVICE']['help'][lang]
+    )
+
+
+def cmd_cancel(update, context):
+    """ Handler: command /cancel """
+    user = User.get_user(update.message.chat_id)
+
+    # reset user settings:
+    user.settings.fsm_state = FSM.START.value
+    user.save()
+
+    context.bot.send_message(
+        user.user_id, txt['SERVICE']['cancel'][user.settings.language]
     )
