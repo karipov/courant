@@ -1,15 +1,13 @@
 {
-    "LANGS": ["en", "ru"],
-    "LANG_NAMES": ["English", "Русский"],
+    "LANGS": ["en"],
+    "LANG_NAMES": ["English"],
     "SERVICE": {
         "start": {
-            "en": "Hello there! Please select your language:",
-            "ru": "Privet... viberi svoy yazik:"
+            "en": "Hello there! Please select your language:"
         },
 
         "help": {
-            "en": "Contact @tgcode for more info.",
-            "ru": "tak davay pishi @tgcode esli est problemi chuvachello."
+            "en": "Contact @tgcode for more info."
         },
 
         "cancel": {
@@ -17,22 +15,19 @@
         },
 
         "invited_by": {
-            "en": "You've been invited by user: {}",
-            "ru": "Vi prigrlasheni {}"
+            "en": "You've been invited by user: {}"
         }
     },
 
     "CALLBACK": {
         "lang_select": {
-            "en": "Language set to English.",
-            "ru": "Postavili russkiy."
+            "en": "Language set to English."
         }
     },
 
     "ADMIN": {
         "stats": {
-            "en": "here you go you creep:\n- total users: {}",
-            "ru": "tak vot tvoi statistiki: {}"
+            "en": "here you go you creep:\n- total users: {}"
         }
     },
 
@@ -47,7 +42,7 @@
 
         "1": {
             "text": {
-                "en": "{}\n\nNow, please choose how you'd like to set up your news:"
+                "en": "Now, please choose how you'd like to set up your news:"
             },
             "markup": {
                 "en": ["Manual", "Explore"]
