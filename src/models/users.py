@@ -8,7 +8,7 @@ import datetime
 
 class Settings(EmbeddedDocument):
     language = StringField(required=True)
-    fsm_state = IntField(default=0)
+    fsm_state = StringField(default='0')
 
 
 class User(Document):
@@ -35,6 +35,7 @@ class User(Document):
         self.users_invited.append(payload)
         self.save()
 
+    # SHORTHANDS
     @classmethod
     def get_user(cls, uid: int) -> User:
         """
