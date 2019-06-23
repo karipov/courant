@@ -12,6 +12,10 @@
             "ru": "tak davay pishi @tgcode esli est problemi chuvachello."
         },
 
+        "cancel": {
+            "en": "Action cancelled. Please send /start to configure the bot again."
+        },
+
         "invited_by": {
             "en": "You've been invited by user: {}",
             "ru": "Vi prigrlasheni {}"
@@ -34,14 +38,38 @@
 
     "FSM": {
         "0": {
-            "en": "hello there! Please send me your preffered language"
-        },
-        "1": {
-            "en": "Cool! Now, you have 3 options to choose from:"
+            "text": {
+                "en": "Hello there! Please select your preffered language:"
+            },
+            "markup": [],
+            "payload": []
         },
 
-        "2": {
-            "en": "Great choice! Here is the setup for {}."
+        "1": {
+            "text": {
+                "en": "{}\n\nNow, please choose how you'd like to set up your news:"
+            },
+            "markup": {
+                "en": ["Manual", "Explore"]
+            },
+            "payload": ["fsm:1:manual", "fsm:1:explore"]
+        },
+
+        "2.1": {
+            "text": {
+                "en": "Manual Entry\n\nPlease select the type of news feed you'd like to set up:"
+            },
+            "markup": {
+                "en": ["RSS Feed", "Channels", "Go Back"]
+            },
+            "payload": ["fsm:2.1:rss", "fsm:2.1:channels", "fsm:2.1:back"]
+        },
+        "2.2": {
+            "text": {
+                "en": "Explore\n\nPlease send me a list of topics you'd like to see in your news feeds"
+            },
+            "markup": [],
+            "payload": []
         }
     }
 }
