@@ -12,6 +12,7 @@ config = json.load(open(Path.cwd().joinpath('src/config.json')))
 
 class FSM(Enum):
     START = '0'
-    SELECT_LANGUAGE = '1'
-    ENTRY_TYPE = '2'
+    ENTRY_TYPE = '1'
+
     MANUAL_ENTRY = '2.1'
+    EXPLORE_ENTRY = '2.2'
