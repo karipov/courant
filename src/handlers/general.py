@@ -9,12 +9,10 @@ Currently contains filters for:
 - text messages with certain FSM states
 """
 
-# from .shared import (
-#     txt, FSM
-# )
-# from models import User
-
 
 def unprompted_message_handler(update, context):
     """ Handler for unprompted messages """
-    pass
+    context.bot.delete_message(
+        update.message.chat_id,
+        update.message.message_id
+        )
