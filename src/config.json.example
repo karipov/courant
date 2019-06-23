@@ -1,0 +1,10 @@
+{
+    "TELEGRAM": {
+        "token": "",
+        "admin": [...]
+    },
+
+    "MONGO": {
+        "name": ""
+    }
+}
