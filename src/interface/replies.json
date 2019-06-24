@@ -1,6 +1,8 @@
 {
-    "LANGS": ["en"],
+    "LANG_CODES": ["en"],
+    "LANG_PAYLOAD": ["fsm:1:en:2"],
     "LANG_NAMES": ["English"],
+
     "SERVICE": {
         "start": {
             "en": "Hello there! Please select your language:"
@@ -20,8 +22,8 @@
     },
 
     "CALLBACK": {
-        "lang_select": {
-            "en": "Language set to English."
+        "restart": {
+            "en": "Please restart your bot with /start."
         }
     },
 
@@ -32,7 +34,7 @@
     },
 
     "FSM": {
-        "0": {
+        "1": {
             "text": {
                 "en": "Hello there! Please select your preffered language:"
             },
@@ -40,31 +42,33 @@
             "payload": []
         },
 
-        "1": {
+        "2": {
             "text": {
-                "en": "Now, please choose how you'd like to set up your news:"
+                "en": "<i>Language set to English</i>\n\nNow, choose how you'd like to set up your news:"
             },
             "markup": {
                 "en": ["Manual", "Explore"]
             },
-            "payload": ["fsm:1:manual", "fsm:1:explore"]
+            "payload": ["fsm:2:manual:2.1", "fsm:2:explore:2.2"]
         },
 
         "2.1": {
             "text": {
-                "en": "Manual Entry\n\nPlease select the type of news feed you'd like to set up:"
+                "en": "<i>Manual Entry</i>\n\nGreat! Select the type of news feed you'd like to set up:"
             },
             "markup": {
                 "en": ["RSS Feed", "Channels", "Go Back"]
             },
-            "payload": ["fsm:2.1:rss", "fsm:2.1:channels", "fsm:2.1:back"]
+            "payload": ["fsm:2.1:rss", "fsm:2.1:channels", "fsm:2"]
         },
         "2.2": {
             "text": {
-                "en": "Explore\n\nPlease send me a list of topics you'd like to see in your news feeds"
+                "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n US News, Astronomy, Telegram"
             },
-            "markup": [],
-            "payload": []
+            "markup": {
+                "en": ["Go Back"]
+            },
+            "payload": ["fsm:2"]
         }
     }
 }

@@ -14,7 +14,7 @@ from models import User, Settings
 import utility
 
 
-markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANGS'])
+markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANG_PAYLOAD'])
 
 
 def get_payload(text: str):
@@ -34,7 +34,9 @@ def cmd_start(update, context):
     """ Handler: command /start <PAYLOAD> """
     uid = update.message.chat_id
     # temporary language, until user selects via callback
-    lang = utility.lang(update.message.from_user.language_code, txt['LANGS'])
+    lang = utility.lang(
+        update.message.from_user.language_code, txt['LANG_CODES']
+        )
     payload = get_payload(update.message.text)
 
     # build account for a user if it doesn't exist
@@ -44,12 +46,15 @@ def cmd_start(update, context):
             settings=Settings(language=lang)
         ).save()
 
-    current_user = User.get_user(uid=uid)
+    # current_user = User.get_user(uid=uid)
 
     # delete message if the user is in another FSM state
-    if not current_user.settings.fsm_state == FSM.START.value:
-        context.bot.delete_message(uid, update.message.message_id)
-        return
+    # if not current_user.settings.fsm_state == FSM.START.value:
+    #     context.bot.delete_message(uid, update.message.message_id)
+    #     return
+
+    # current_user.settings.fsm_state = FSM.LANGUAGE.value
+    # current_user.save()
 
     # worry about payloads and invites below:
     if not payload:
@@ -72,11 +77,10 @@ def cmd_start(update, context):
 
 def cmd_help(update, context):
     """ Handler: command /help """
-    uid = update.message.chat_id
-    lang = utility.lang(update.message.from_user.language_code, txt['LANGS'])
+    user = User.get_user(update.message.chat_id)
 
     context.bot.send_message(
-        uid, txt['SERVICE']['help'][lang]
+        user.user_id, txt['SERVICE']['help'][user.settings.language]
     )
 
 

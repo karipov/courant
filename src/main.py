@@ -19,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 def error(update, context):
     """ Log Errors caused by Updates """
-    logger.warning('Update "%s" caused error "%s"', update, error)
+    logger.warning(
+        'Update "%s" caused error "%s"', update, error
+        )
 
 
 # ADDING HANDLERS HERE
@@ -30,7 +32,7 @@ dispatcher.add_handler(CommandHandler('cancel', service.cmd_cancel))
 dispatcher.add_handler(CommandHandler('help', service.cmd_help))
 
 # add callback handlers
-dispatcher.add_handler(CallbackQueryHandler(callback.cmd_language_select))
+dispatcher.add_handler(CallbackQueryHandler(callback.master_callback))
 
 # add error handler
 dispatcher.add_error_handler(error)
