@@ -47,7 +47,7 @@ class User(Document):
         user = cls.objects(user_id=uid)
 
         if len(user) == 0 or len(user) > 1:
-            return None
+            raise LookupError(f"User {uid} not found.")
 
         # return the single element form the list
         return user[0]
