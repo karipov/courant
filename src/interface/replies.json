@@ -1,6 +1,6 @@
 {
     "LANG_CODES": ["en"],
-    "LANG_PAYLOAD": ["fsm:1:en:2"],
+    "LANG_PAYLOAD": ["fsm:2:en"],
     "LANG_NAMES": ["English"],
 
     "SERVICE": {
@@ -33,6 +33,7 @@
         }
     },
 
+
     "FSM": {
         "1": {
             "text": {
@@ -49,7 +50,7 @@
             "markup": {
                 "en": ["Manual", "Explore"]
             },
-            "payload": ["fsm:2:manual:2.1", "fsm:2:explore:2.2"]
+            "payload": ["fsm:2.1:manual", "fsm:2.2:explore"]
         },
 
         "2.1": {
@@ -57,18 +58,29 @@
                 "en": "<i>Manual Entry</i>\n\nGreat! Select the type of news feed you'd like to set up:"
             },
             "markup": {
-                "en": ["RSS Feed", "Channels", "Go Back"]
+                "en": ["RSS Feed", "Channels", "« Back"]
             },
-            "payload": ["fsm:2.1:rss", "fsm:2.1:channels", "fsm:2"]
+            "payload": ["fsm:2.1.1:rss", "fsm:2.1.2:channels", "fsm:2:back"]
         },
-        "2.2": {
+
+        "2.1.1": {
             "text": {
-                "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n US News, Astronomy, Telegram"
+                "en": "<i>RSS Feeds</i>\n\nSend me a list of RSS/Atom links you'd like to follow - each on its own line. Here's an <a href=\"\">example</a>"
             },
             "markup": {
-                "en": ["Go Back"]
+                "en": ["« Back"]
             },
-            "payload": ["fsm:2"]
+            "payload": ["fsm:2.1:back"]
+        },
+
+        "2.2": {
+            "text": {
+                "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>"
+            },
+            "markup": {
+                "en": ["« Back"]
+            },
+            "payload": ["fsm:2:back"]
         }
     }
 }
