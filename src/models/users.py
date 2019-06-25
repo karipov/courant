@@ -8,7 +8,7 @@ import datetime
 
 class Settings(EmbeddedDocument):
     language = StringField(required=True)
-    fsm_state = StringField(default='0')
+    fsm_state = StringField(default='0', regex='(\\d\\.)*\\d')
 
 
 class User(Document):
