@@ -46,15 +46,15 @@ def cmd_start(update, context):
             settings=Settings(language=lang)
         ).save()
 
-    # current_user = User.get_user(uid=uid)
+    current_user = User.get_user(uid=uid)
 
     # delete message if the user is in another FSM state
-    # if not current_user.settings.fsm_state == FSM.START.value:
-    #     context.bot.delete_message(uid, update.message.message_id)
-    #     return
+    if not current_user.settings.fsm_state == '0':
+        context.bot.delete_message(uid, update.message.message_id)
+        return
 
-    # current_user.settings.fsm_state = FSM.LANGUAGE.value
-    # current_user.save()
+    current_user.settings.fsm_state = FSM.LANGUAGE.value
+    current_user.save()
 
     # worry about payloads and invites below:
     if not payload:

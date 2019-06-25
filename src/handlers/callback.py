@@ -16,15 +16,16 @@ def master_callback(update, context):
     data_filter = query.data.split(config['TELEGRAM']['delim'])
 
     if data_filter[0] != 'fsm':
+        # haven't dealt with anything that isn't FSM yet, so just
+        # quit if we see a problem.
         return
 
-    # TODO: delete message if state is wrong
-    # TODO: user callback state is not used at all to check the fsm state.
-    # must remember to use this, and maybe do away with fsm states shown in
-    # the replies.json 'callback' field. makes it awkward.
+    user_state = db_user.settings.fsm_state
+
     # pseudo-switch/case statement
     fsm_options = {
         '0': alert_restart,
+
         '1': cmd_entry_type,
         '2': manual_explore_entry,
 
@@ -32,7 +33,7 @@ def master_callback(update, context):
         '2.2': cmd_explore_entry
     }
 
-    fsm_options[data_filter[1]](update, context, db_user)
+    fsm_options[user_state](update, context, db_user)
 
 
 def alert_restart(update, context, user):
@@ -44,12 +45,15 @@ def alert_restart(update, context, user):
         show_alert=True
     )
 
+    # TODO: other than restarting, also either delete the previous message pr
+    # modify it so that the keyboard doesn't exist anymore.
+
 
 def cmd_entry_type(update, context, user):
     """ Handler: fsm:1 -> fsm:2 """
     query = update.callback_query
     chosen_language_code = query.data.split(config['TELEGRAM']['delim'])[2]
-    state = query.data.split(config['TELEGRAM']['delim'])[3]
+    state = query.data.split(config['TELEGRAM']['delim'])[1]
 
     user.settings.language = chosen_language_code
     user.settings.fsm_state = state
@@ -75,7 +79,7 @@ def cmd_entry_type(update, context, user):
 def manual_explore_entry(update, context, user):
     """ Handler fsm:2 -> fsm:2.1 | fsm:2.2"""
     query = update.callback_query
-    state = query.data.split(config['TELEGRAM']['delim'])[3]
+    state = query.data.split(config['TELEGRAM']['delim'])[1]
 
     user.settings.fsm_options = state
     user.save()
@@ -98,9 +102,11 @@ def manual_explore_entry(update, context, user):
 
 def cmd_manual_entry(update, context, user):
     """ Handler: fsm:2.1 -> fsm: 2.1.1 """
-    pass
+    print('manual entry disabled')
+    context.bot.answer_callback_query()
 
 
 def cmd_explore_entry(update, context, user):
     """ Handler: fsm:2.2 -> fsm: 2.2.1 """
-    pass
+    print('explore entry disabled')
+    context.bot.answer_callback_query()
