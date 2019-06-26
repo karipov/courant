@@ -24,6 +24,10 @@
     "CALLBACK": {
         "restart": {
             "en": "Please restart your bot with /start."
+        },
+
+        "deleted": {
+            "en": "<i>Closed.</i>"
         }
     },
 
@@ -35,6 +39,8 @@
 
 
     "FSM": {
+        "STATES": "",
+
         "1": {
             "text": {
                 "en": "Hello there! Please select your preffered language:"
@@ -42,7 +48,6 @@
             "markup": [],
             "payload": []
         },
-
         "2": {
             "text": {
                 "en": "<i>Language set to English</i>\n\nNow, choose how you'd like to set up your news:"
@@ -52,17 +57,15 @@
             },
             "payload": ["fsm:2.1:manual", "fsm:2.2:explore"]
         },
-
         "2.1": {
             "text": {
                 "en": "<i>Manual Entry</i>\n\nGreat! Select the type of news feed you'd like to set up:"
             },
             "markup": {
-                "en": ["RSS Feed", "Channels", "« Back"]
+                "en": ["RSS Feeds", "Channels", "« Back"]
             },
             "payload": ["fsm:2.1.1:rss", "fsm:2.1.2:channels", "fsm:2:back"]
         },
-
         "2.1.1": {
             "text": {
                 "en": "<i>RSS Feeds</i>\n\nSend me a list of RSS/Atom links you'd like to follow - each on its own line. Here's an <a href=\"\">example</a>"
@@ -72,7 +75,15 @@
             },
             "payload": ["fsm:2.1:back"]
         },
-
+        "2.1.2": {
+            "text": {
+                "en": "<i>Channels\n\n</i>Send me a list of usenames of telegram channels you'd like to follow - each on its own line. Here's an <a href=\"\">example</a>"
+            },
+            "markup": {
+                "en": ["« Back"]
+            },
+            "payload": ["fsm:2.1:back"]
+        },
         "2.2": {
             "text": {
                 "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>"
@@ -81,6 +92,14 @@
                 "en": ["« Back"]
             },
             "payload": ["fsm:2:back"]
+        },
+        "2.2.1": {
+            "text": {
+                "en": "Loading..."
+            },
+            "text2": {
+                "en": "Suggestions for channels and RSS feeds to follow have been compiled. Select which ones you'd like to follow by clicking the buttons below:"
+            }
         }
     }
 }
