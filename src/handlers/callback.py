@@ -2,6 +2,8 @@ from .shared import txt, config
 from models import User
 import utility
 
+from telegram import TelegramError
+
 
 def master_callback(update, context):
     """
@@ -33,7 +35,10 @@ def master_callback(update, context):
         '2.2': cmd_explore_entry
     }
 
+    print(f"current user state (db - exec.): {user_state}")
+    print(f"future user state (json): {data_filter[1]}")
     fsm_options[user_state](update, context, db_user)
+    print()
 
 
 def alert_restart(update, context, user):
@@ -41,47 +46,33 @@ def alert_restart(update, context, user):
 
     context.bot.answer_callback_query(
         callback_query_id=query.id,
-        text=txt['CALLBACK']['restart'][user.settings.language],
-        show_alert=True
+        text=txt['CALLBACK']['restart'][user.settings.language]
     )
+
+    try:
+        context.bot.delete_message(
+            chat_id=query.from_user.id,
+            message_id=query.message.message_id
+        )
+    # if the message is older than 48h, you cannot delete it.
+    # however, you can edit any message at any time
+    except TelegramError:
+        query.edit_message_text(
+            text=txt['CALLBACK']['deleted'][user.settings.language]
+        )
 
     # TODO: other than restarting, also either delete the previous message pr
     # modify it so that the keyboard doesn't exist anymore.
 
 
-def cmd_entry_type(update, context, user):
-    """ Handler: fsm:1 -> fsm:2 """
+def general_callback(update, context, user):
+    """
+    This function can be used for general callback operations.
+    """
     query = update.callback_query
-    chosen_language_code = query.data.split(config['TELEGRAM']['delim'])[2]
     state = query.data.split(config['TELEGRAM']['delim'])[1]
 
-    user.settings.language = chosen_language_code
     user.settings.fsm_state = state
-    user.save()
-
-    new_content = (
-        f"{txt['FSM'][state]['text'][chosen_language_code]}"
-    )
-
-    keyboard = utility.gen_keyboard(
-        txt['FSM'][state]['markup'][chosen_language_code],
-        txt['FSM'][state]['payload']
-    )
-
-    # edit the message to display the selected language
-    query.edit_message_text(
-        text=new_content,
-        reply_markup=keyboard,
-        parse_mode='HTML'
-    )
-
-
-def manual_explore_entry(update, context, user):
-    """ Handler fsm:2 -> fsm:2.1 | fsm:2.2"""
-    query = update.callback_query
-    state = query.data.split(config['TELEGRAM']['delim'])[1]
-
-    user.settings.fsm_options = state
     user.save()
 
     new_content = (
@@ -93,6 +84,7 @@ def manual_explore_entry(update, context, user):
         txt['FSM'][state]['payload']
     )
 
+    # edit the message to display the selected language
     query.edit_message_text(
         text=new_content,
         reply_markup=keyboard,
@@ -100,13 +92,41 @@ def manual_explore_entry(update, context, user):
     )
 
 
+def cmd_entry_type(update, context, user):
+    """ Handler: fsm:1 -> fsm:2 """
+    query = update.callback_query
+    chosen_language_code = query.data.split(config['TELEGRAM']['delim'])[2]
+
+    user.settings.language = chosen_language_code
+    user.save()
+
+    general_callback(update, context, user)
+
+
+def manual_explore_entry(update, context, user):
+    """ Handler fsm:2 -> fsm:2.1 | fsm:2.2"""
+    general_callback(update, context, user)
+
+
 def cmd_manual_entry(update, context, user):
     """ Handler: fsm:2.1 -> fsm: 2.1.1 """
     print('manual entry disabled')
-    context.bot.answer_callback_query()
+    query = update.callback_query
+    # state = query.data.split(config['TELEGRAM']['delim'])[1]
+
+    # user.settings.fsm_state = state
+    # user.save()
+
+    context.bot.answer_callback_query(query.id)
 
 
 def cmd_explore_entry(update, context, user):
     """ Handler: fsm:2.2 -> fsm: 2.2.1 """
     print('explore entry disabled')
-    context.bot.answer_callback_query()
+    query = update.callback_query
+    # state = query.data.split(config['TELEGRAM']['delim'])[1]
+
+    # user.settings.fsm_state = state
+    # user.save()
+
+    context.bot.answer_callback_query(query.id)
