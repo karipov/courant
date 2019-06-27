@@ -3,8 +3,12 @@ Helper module for various functionality
 """
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from anytree.importer import DictImporter
+from anytree.search import findall
+from anytree import Node
 
-def extract_payload(text, num_values=1, delim=' '):
+
+def extract_payload(text: str, num_values=1, delim=' ') -> list:
     """
     Extract additional information from commands
 
@@ -45,3 +49,26 @@ def lang(lang: str, allowed: list, default='en') -> str:
         return default
     else:
         return lang
+
+
+def check_fsm(current: str, future: str, tree: dict) -> bool:
+    """
+    Checks if the user is correctly following the Finite State Machine
+
+    :param current: current FSM state of the user
+    :param future: FSM that is to be set
+    :param tree: the order in which the FSM must be executed
+    :return: whether or not user is doing a legal operation
+    """
+    root = DictImporter(nodecls=Node).import_(tree)
+    nodes = findall(root, filter_=lambda node: node.name in (current, future))
+
+    if len(nodes) != 2:
+        return False
+
+    # this is to support 'back' functionality
+    # checks if the nodes are parent-child related
+    if nodes[0].parent == nodes[1] or nodes[1].parent == nodes[0]:
+        return True
+
+    return False

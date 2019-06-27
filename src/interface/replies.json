@@ -37,9 +37,35 @@
         }
     },
 
+    "GENERAL": {
+        "set_up": {
+            "en": "You're all set up!"
+        }
+    },
+
 
     "FSM": {
-        "STATES": "",
+        "TREE": {
+            "name": "1",
+            "children": [
+                {
+                    "name": "2",
+                    "children": [
+                        {
+                            "name": "2.1",
+                            "children": [
+                                {"name": "2.1.1"},
+                                {"name": "2.1.2"}
+                            ]
+                        },
+                        {
+                            "name": "2.2",
+                            "children": [{"name": "2.2.1"}]
+                        }
+                    ]
+                }
+            ]
+        },
 
         "1": {
             "text": {
