@@ -2,8 +2,10 @@ from pathlib import Path
 from json import load
 import logging
 
-from handlers import admin, service, callback
+from handlers import admin, service, callback, general
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
+from telegram.ext import MessageHandler
+from telegram.ext.filters import Filters
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,6 +32,9 @@ dispatcher.add_handler(CommandHandler('admin', admin.cmd_admin))
 dispatcher.add_handler(CommandHandler('start', service.cmd_start))
 dispatcher.add_handler(CommandHandler('cancel', service.cmd_cancel))
 dispatcher.add_handler(CommandHandler('help', service.cmd_help))
+
+# adding message habdlers
+dispatcher.add_handler(MessageHandler(Filters.text, general.master))
 
 # add callback handlers
 dispatcher.add_handler(CallbackQueryHandler(callback.master_callback))

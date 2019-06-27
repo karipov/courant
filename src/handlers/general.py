@@ -9,10 +9,20 @@ Currently contains filters for:
 - text messages with certain FSM states
 """
 
+from models import User
 
-def unprompted_message_handler(update, context):
-    """ Handler for unprompted messages """
-    context.bot.delete_message(
-        update.message.chat_id,
-        update.message.message_id
-        )
+
+def master(update, context):
+    """
+    This handler is implemented to generally deal with FSM states in incoming
+    messages.
+    """
+    db_user = User.get_user(update.message.from_user.id)
+    state = db_user.settings.fsm_state
+
+    # TODO: fill the fsm_options
+    fsm_options = {
+        '': ''
+    }
+
+    fsm_options[state](update, context, db_user)
