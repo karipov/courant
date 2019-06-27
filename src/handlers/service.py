@@ -48,7 +48,7 @@ def cmd_start(update, context):
 
     current_user = User.get_user(uid=uid)
 
-    # delete message if the user is in another FSM state
+    # don't do anything if the user is in another FSM state
     if not current_user.settings.fsm_state == '0':
         context.bot.delete_message(uid, update.message.message_id)
         return
@@ -64,14 +64,16 @@ def cmd_start(update, context):
             )
         return
 
-    inviter = User.get_user(uid=payload)
-
-    if not inviter:
+    try:
+        inviter = User.get_user(uid=payload)
+    except LookupError:
         return
 
     inviter.add_to_invited(uid)
     context.bot.send_message(
-        uid, txt['SERVICE']['invited_by'][lang].format(payload)
+        uid, txt['SERVICE']['invited_by'][lang].format(
+            context.bot.get_chat(payload).first_name
+        )
     )
 
 
