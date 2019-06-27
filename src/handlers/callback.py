@@ -27,7 +27,8 @@ def master_callback(update, context):
     checked = utility.check_fsm(
         current=user_state,
         future=data_filter[1],
-        tree=txt['FSM']['TREE'])
+        tree=txt['FSM']['TREE']
+        )
 
     if not checked:
         alert_restart(update, context, db_user)
@@ -39,7 +40,11 @@ def master_callback(update, context):
         '2': manual_explore_entry,
 
         '2.1': cmd_manual_entry,
-        '2.2': cmd_explore_entry
+        '2.2': cmd_explore_entry,
+
+        # if a button is clicked in these states, it's the 'back' button
+        '2.1.1': general_callback,
+        '2.1.2': general_callback,
     }
 
     print(f"current user state (db - exec.): {user_state}")
@@ -116,23 +121,9 @@ def manual_explore_entry(update, context, user):
 
 def cmd_manual_entry(update, context, user):
     """ Handler: fsm:2.1 -> fsm: 2.1.1 """
-    print('manual entry disabled')
-    query = update.callback_query
-    # state = query.data.split(config['TELEGRAM']['delim'])[1]
-
-    # user.settings.fsm_state = state
-    # user.save()
-
-    context.bot.answer_callback_query(query.id)
+    general_callback(update, context, user)
 
 
 def cmd_explore_entry(update, context, user):
     """ Handler: fsm:2.2 -> fsm: 2.2.1 """
-    print('explore entry disabled')
-    query = update.callback_query
-    # state = query.data.split(config['TELEGRAM']['delim'])[1]
-
-    # user.settings.fsm_state = state
-    # user.save()
-
-    context.bot.answer_callback_query(query.id)
+    general_callback(update, context, user)
