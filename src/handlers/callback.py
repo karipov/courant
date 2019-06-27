@@ -24,10 +24,17 @@ def master_callback(update, context):
 
     user_state = db_user.settings.fsm_state
 
+    checked = utility.check_fsm(
+        current=user_state,
+        future=data_filter[1],
+        tree=txt['FSM']['TREE'])
+
+    if not checked:
+        alert_restart(update, context, db_user)
+        return
+
     # pseudo-switch/case statement
     fsm_options = {
-        '0': alert_restart,
-
         '1': cmd_entry_type,
         '2': manual_explore_entry,
 
@@ -44,10 +51,7 @@ def master_callback(update, context):
 def alert_restart(update, context, user):
     query = update.callback_query
 
-    context.bot.answer_callback_query(
-        callback_query_id=query.id,
-        text=txt['CALLBACK']['restart'][user.settings.language]
-    )
+    context.bot.answer_callback_query(query.id)
 
     try:
         context.bot.delete_message(
@@ -71,6 +75,8 @@ def general_callback(update, context, user):
     """
     query = update.callback_query
     state = query.data.split(config['TELEGRAM']['delim'])[1]
+
+    context.bot.answer_callback_query(query.id)
 
     user.settings.fsm_state = state
     user.save()

@@ -21,11 +21,12 @@ which is:
 
 
 ## For Translators
-There are some general guidelines to follow:
+You must **ignore** (as in don't touch):
 
-- **Ignore** the HTML formatting tags, such as, but not limited to: `<a href="">`,
+- the HTML formatting tags, such as, but not limited to: `<a href="">`,
 `<i>`, `</i>` and others, but make sure they stay intace as you are translating
-- **Do not touch** the `payload` key and its values
+- the `payload` key and its values
+- the `TREE` key and its values
 
 If you've noticed that your language code does not appear with an empty key in 
 all of the responses, i.e. if it doesn't look like below:
