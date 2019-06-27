@@ -45,28 +45,6 @@
 
 
     "FSM": {
-        "TREE": {
-            "name": "1",
-            "children": [
-                {
-                    "name": "2",
-                    "children": [
-                        {
-                            "name": "2.1",
-                            "children": [
-                                {"name": "2.1.1"},
-                                {"name": "2.1.2"}
-                            ]
-                        },
-                        {
-                            "name": "2.2",
-                            "children": [{"name": "2.2.1"}]
-                        }
-                    ]
-                }
-            ]
-        },
-
         "1": {
             "text": {
                 "en": "Hello there! Please select your preffered language:"
@@ -83,6 +61,7 @@
             },
             "payload": ["fsm:2.1:manual", "fsm:2.2:explore"]
         },
+
         "2.1": {
             "text": {
                 "en": "<i>Manual Entry</i>\n\nGreat! Select the type of news feed you'd like to set up:"
@@ -110,6 +89,7 @@
             },
             "payload": ["fsm:2.1:back"]
         },
+
         "2.2": {
             "text": {
                 "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>"
@@ -126,6 +106,39 @@
             "text2": {
                 "en": "Suggestions for channels and RSS feeds to follow have been compiled. Select which ones you'd like to follow by clicking the buttons below:"
             }
+        },
+
+        "TREE": {
+            "name": "1",
+            "children": [
+                {
+                    "name": "2",
+                    "children": [
+                        {
+                            "name": "2.1",
+                            "children": [
+                                {
+                                    "name": "2.1.1",
+                                    "children": [{"name": "3"}]
+                                },
+                                {
+                                    "name": "2.1.2",
+                                    "children": [{"name": "3"}]
+                                }
+                            ]
+                        },
+                        {
+                            "name": "2.2",
+                            "children": [
+                                {
+                                    "name": "2.2.1",
+                                    "children": [{"name": "3"}]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     }
 }
