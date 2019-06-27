@@ -1,3 +1,4 @@
+anytree==2.6.0
 asn1crypto==0.24.0
 astroid==2.2.5
 certifi==2019.3.9
