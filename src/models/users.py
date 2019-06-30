@@ -3,20 +3,26 @@ from __future__ import annotations
 from mongoengine import Document
 from mongoengine import IntField, DateTimeField, ListField, StringField
 from mongoengine import BooleanField, EmbeddedDocument, EmbeddedDocumentField
-import datetime
+from mongoengine import ReferenceField
+from datetime import datetime
 
 
 class Settings(EmbeddedDocument):
     language = StringField(required=True)
-    fsm_state = StringField(default='0', regex='(\\d\\.)*\\d')
+    fsm_state = StringField(default='0', regex="(\\d\\.)*\\d")
+
+
+class Subscribed(EmbeddedDocument):
+    rss_list = ListField(ReferenceField(), default=list)
 
 
 class User(Document):
     user_id = IntField(unique=True, required=True)
-    registered = DateTimeField(default=datetime.datetime.now)
+    registered = DateTimeField(default=datetime.now)
     premium = BooleanField(required=True, default=False)
     users_invited = ListField(IntField())
     settings = EmbeddedDocumentField(Settings, required=True)
+    subscribed = EmbeddedDocument(Subscribed)
 
     meta = {
         'indexes': ['user_id'],
@@ -46,6 +52,7 @@ class User(Document):
         """
         user = cls.objects(user_id=uid)
 
+        # TODO: should raise two different errors
         if len(user) == 0 or len(user) > 1:
             raise LookupError(f"User {uid} not found.")
 
