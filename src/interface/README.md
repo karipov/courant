@@ -19,17 +19,39 @@ which is:
 <type of callback data; default 'fsm'> : <future state> : <additional info>
 ```
 
+Additionally, it also contains a **hierarchal tree structure** of it's states
+and how they are related to each other. It's parsed using the
+[anytree](https://github.com/c0fec0de/anytree) library, and looks something
+like this:
+
+```json
+"TREE": {
+    "name": "1",
+    "children": [
+        {
+            "name": "2",
+            "children": [
+                {
+                    "name": "2.1",
+                    "children": [
+...
+```
+
+The tree structure is used in the `check_fsm(...)` function found in
+[`utility.py`](../utility.py).
+
 
 ## For Translators
-You must **ignore** (as in don't touch):
+You must **ignore** (as in *don't touch*):
 
-- the HTML formatting tags, such as, but not limited to: `<a href="">`,
-`<i>`, `</i>` and others, but make sure they stay intace as you are translating
-- the `payload` key and its values
-- the `TREE` key and its values
+- HTML formatting tags, such as, but not limited to: `<a href="">`,
+`<i>`, `</i>` and others; however, make sure they **stay intact** as you are
+translating
+- `FSM/[state]/payload` key and its value(s)
+- `FSM/TREE` key and its value(s)
 
-If you've noticed that your language code does not appear with an empty key in 
-all of the responses, i.e. if it doesn't look like below:
+Furthermore, if you've noticed that your language code does not appear with an
+empty key in all of the responses, i.e. if it doesn't look like below:
 
 ```json
 ...
