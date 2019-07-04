@@ -13,21 +13,26 @@ class Settings(EmbeddedDocument):
 
 
 class Subscribed(EmbeddedDocument):
-    rss_list = ListField(ReferenceField(), default=list)
+    # every field here must have a default
+    rss_list = ListField(ReferenceField('RSS'), default=list)
 
 
 class User(Document):
     user_id = IntField(unique=True, required=True)
     registered = DateTimeField(default=datetime.now)
     premium = BooleanField(required=True, default=False)
-    users_invited = ListField(IntField())
+    users_invited = ListField(IntField)
     settings = EmbeddedDocumentField(Settings, required=True)
-    subscribed = EmbeddedDocument(Subscribed)
+    subscribed = EmbeddedDocumentField(Subscribed)
 
     meta = {
         'indexes': ['user_id'],
         'collection': 'users'
     }
+
+    def clean(self):
+        if not self.subscribed:
+            self.subscribed = Subscribed()
 
     def add_to_invited(self, payload: int):
         """
