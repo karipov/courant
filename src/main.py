@@ -40,7 +40,7 @@ dispatcher.add_handler(MessageHandler(Filters.text, general.master))
 dispatcher.add_handler(CallbackQueryHandler(callback.master_callback))
 
 # add error handler
-dispatcher.add_error_handler(error)
+# dispatcher.add_error_handler(error)
 
 # start polling
 updater.start_polling()
