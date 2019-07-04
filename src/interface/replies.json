@@ -28,12 +28,32 @@
 
         "deleted": {
             "en": "<i>Closed.</i>"
+        },
+
+        "error_link": {
+            "en": "This does not appear to be a valid link. Please try again."
+        },
+
+        "error_feed": {
+            "en": "The RSS feed appears to be missing elements, or is malformed."
+        },
+
+        "error_entries": {
+            "en": "The articles in the RSS feed appear to be missing elements or are malformed."
+        },
+
+        "empty_feed": {
+            "en": " is empty, but has nonetheless been added to your list of RSS feeds."
+        },
+
+        "rss_success": {
+            "en": " has been successfuly added to your list of RSS feeds."
         }
     },
 
     "ADMIN": {
         "stats": {
-            "en": "here you go you creep:\n- total users: {}"
+            "en": "here you go you creep:\n- total users: {0}"
         }
     },
 
