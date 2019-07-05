@@ -7,7 +7,6 @@ from .channels import Channel
 from .rss import RSS
 from .users import User, Settings
 
-
 __all__ = ['Channel', 'RSS', 'User', 'Settings']
 
 # loading the configuration file

@@ -20,6 +20,9 @@ def check_admin(uid: int):
 
 
 def cmd_admin(update, context):
+    """
+    Provides administrators with statistics.
+    """
     uid = update.message.chat_id
 
     if not check_admin(uid):
