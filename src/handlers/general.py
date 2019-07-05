@@ -12,7 +12,10 @@ from .shared import txt, config
 from models import User, RSS
 from scrape import rss_parse
 
+import logging
+
 from mongoengine import errors
+from telegram.message import MessageEntity
 
 
 def master(update, context):
@@ -24,9 +27,7 @@ def master(update, context):
     user_state = db_user.settings.fsm_state
 
     fsm_options = {
-        '2.1.1': rss_compile,
-        '2.1.2': channel_compile,
-
+        '2.1': manual_compile,
         '2.2': explore_compile
     }
 
@@ -40,14 +41,43 @@ def general_compile(update, context, user):
     This could be useful in case the need arises to add more services,
     which will all basically use the same backend or same pieces of code.
     """
-    pass
+    raise NotImplementedError()
 
 
-def rss_compile(update, context, user):
-    """ Handler: fsm:2.1.1 -> ___ """
+def manual_compile(update, context, user):
+    """
+    Detects whether the answer to the Manual Entry is a link, or username
+    """
+    entities = update.message.parse_entities(
+        types=['mention', 'url']
+    )
+
+    logging.debug(f"Entities @ Manual Mode: {entities}")
+
+    if not entities:
+        context.bot.send_message(
+            chat_id=update.message.from_user.id,
+            text=txt['CALLBACK']['error'][user.settings.language]
+        )
+        return
+
+    for key, link in entities.items():
+        if key.type == MessageEntity.URL:
+            rss_compile(update, context, user, link)
+            continue
+
+        # TODO: implement Telegram channels.
+
+
+def rss_compile(update, context, user, link):
+    """
+    Handler: fsm:2.1 -> ___
+
+    :param user: mongoengine User object
+    :param link: the extracted entity from the message
+    """
     # TODO: /done command should finish the compilation
-    text = update.message.text
-    news = rss_parse.parse_url(text)
+    news = rss_parse.parse_url(link)
 
     # check the source for possible errors, such as bozo and format
     if not rss_parse.check_source(news):
@@ -71,10 +101,9 @@ def rss_compile(update, context, user):
         )
         return
 
-    # now, all entries must be checked for certain required elements
-    # that will hopefully enrich user experience.
+    # all entries must be checked for certain required elements
     # this must strike a fine balance between universality and enough
-    # information for a good display of the RSS feed..
+    # information for a good display of the RSS feed
     checked_all_entries = all([
         rss_parse.check_parsed(
             x, config['SCRAPE']['RSS']['req_entry_keys']
@@ -91,7 +120,6 @@ def rss_compile(update, context, user):
 
     # if all the checks have so far been passed, then we create the RSS
     # feed in our database and register it - unless it already exists.
-
     try:
         db_news = RSS(
             link=news.feed.link,
@@ -102,7 +130,10 @@ def rss_compile(update, context, user):
         db_news.subscribed.append(user.user_id)
         db_news.save()
     except errors.NotUniqueError:
-        # TODO: process the error by sending a message
+        context.bot.send_message(
+            chat_id=user.user_id,
+            text=txt['CALLBACK']['repeated_rss'][user.settings.language]
+        )
         return
 
     user.subscribed.rss_list.append(db_news.pk)
@@ -130,12 +161,12 @@ def rss_compile(update, context, user):
     )
 
     # TODO: add "Send <smth> when done"
-    # TODO: remove RSS feed from list if it has no subscribers
+    # TODO: remove RSS feed from db if it has no subscribers
     # TODO: implement RSS feed removal
 
 
 def channel_compile(update, context, user):
-    """ Handler: fsm:2.1.2 -> fsm:3 """
+    """ Handler: fsm:2.1 -> ___ """
     pass
 
 

@@ -16,6 +16,10 @@
             "en": "Action cancelled. Please send /start to configure the bot again."
         },
 
+        "done": {
+            "en": "Your options have been registered."
+        },
+
         "invited_by": {
             "en": "You've been invited by user: {}"
         }
@@ -28,6 +32,10 @@
 
         "deleted": {
             "en": "<i>Closed.</i>"
+        },
+
+        "error": {
+            "en": "Your message doesn't appear to be a @username or a URL. Please try again."
         },
 
         "error_link": {
@@ -44,6 +52,10 @@
 
         "empty_feed": {
             "en": " is empty, but has nonetheless been added to your list of RSS feeds."
+        },
+
+        "repeated_rss": {
+            "en": "You are already subscribed to this RSS feed."
         },
 
         "rss_success": {
@@ -84,30 +96,12 @@
 
         "2.1": {
             "text": {
-                "en": "<i>Manual Entry</i>\n\nGreat! Select the type of news feed you'd like to set up:"
-            },
-            "markup": {
-                "en": ["RSS Feeds", "Channels", "« Back"]
-            },
-            "payload": ["fsm:2.1.1:rss", "fsm:2.1.2:channels", "fsm:2:back"]
-        },
-        "2.1.1": {
-            "text": {
-                "en": "<i>RSS Feeds</i>\n\nSend me a list of RSS/Atom links you'd like to follow - each on its own line. Here's an <a href=\"\">example</a>"
+                "en": "<i>Manual Entry</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
             },
             "markup": {
                 "en": ["« Back"]
             },
-            "payload": ["fsm:2.1:back"]
-        },
-        "2.1.2": {
-            "text": {
-                "en": "<i>Channels\n\n</i>Send me a list of usenames of telegram channels you'd like to follow - each on its own line. Here's an <a href=\"\">example</a>"
-            },
-            "markup": {
-                "en": ["« Back"]
-            },
-            "payload": ["fsm:2.1:back"]
+            "payload": ["fsm:2:back"]
         },
 
         "2.2": {
@@ -136,16 +130,7 @@
                     "children": [
                         {
                             "name": "2.1",
-                            "children": [
-                                {
-                                    "name": "2.1.1",
-                                    "children": [{"name": "3"}]
-                                },
-                                {
-                                    "name": "2.1.2",
-                                    "children": [{"name": "3"}]
-                                }
-                            ]
+                            "children": [{"name": "3"}]
                         },
                         {
                             "name": "2.2",

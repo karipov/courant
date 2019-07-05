@@ -2,6 +2,8 @@ from .shared import txt, config
 from models import User
 import utility
 
+import logging
+
 from telegram import TelegramError
 
 
@@ -39,21 +41,24 @@ def master_callback(update, context):
         '1': cmd_entry_type,
         '2': manual_explore_entry,
 
-        '2.1': cmd_manual_entry,
-        '2.2': cmd_explore_entry,
-
-        # if a button is clicked in these states, it's the 'back' button
-        '2.1.1': general_callback,
-        '2.1.2': general_callback,
+        # if a button is clicked here, it's the "back" button
+        '2.1': general_callback,
+        '2.2': general_callback,
     }
 
-    print(f"current user state (db - exec.): {user_state}")
-    print(f"future user state (json): {data_filter[1]}")
+    logging.debug(f"current user state (db - exec.): {user_state}")
+    logging.debug(f"future user state (json): {data_filter[1]}")
+
     fsm_options[user_state](update, context, db_user)
-    print()
 
 
 def alert_restart(update, context, user):
+    """
+    If a user decides to click a button they aren't supposed to, then this
+    function will notify them.
+
+    :param user: the MongoEngine User object.
+    """
     query = update.callback_query
 
     context.bot.answer_callback_query(query.id)
@@ -67,16 +72,16 @@ def alert_restart(update, context, user):
     # however, you can edit any message at any time
     except TelegramError:
         query.edit_message_text(
-            text=txt['CALLBACK']['deleted'][user.settings.language]
+            text=txt['CALLBACK']['deleted'][user.settings.language],
+            parse_mode='HTML'
         )
-
-    # TODO: other than restarting, also either delete the previous message pr
-    # modify it so that the keyboard doesn't exist anymore.
 
 
 def general_callback(update, context, user):
     """
-    This function can be used for general callback operations.
+    This function can be used for general callback operations. It includes
+    features such as extracting the future FSM state, and setting it for the
+    user.
     """
     query = update.callback_query
     state = query.data.split(config['TELEGRAM']['delim'])[1]
@@ -116,14 +121,4 @@ def cmd_entry_type(update, context, user):
 
 def manual_explore_entry(update, context, user):
     """ Handler fsm:2 -> fsm:2.1 | fsm:2.2"""
-    general_callback(update, context, user)
-
-
-def cmd_manual_entry(update, context, user):
-    """ Handler: fsm:2.1 -> fsm: 2.1.1 """
-    general_callback(update, context, user)
-
-
-def cmd_explore_entry(update, context, user):
-    """ Handler: fsm:2.2 -> fsm: 2.2.1 """
     general_callback(update, context, user)
