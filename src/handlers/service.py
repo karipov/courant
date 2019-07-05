@@ -32,7 +32,7 @@ def get_payload(text: str):
 
 def cmd_start(update, context):
     """ Handler: command /start <PAYLOAD> """
-    uid = update.message.chat_id
+    uid = update.message.from_user.id
     # temporary language, until user selects via callback
     lang = utility.lang(
         update.message.from_user.language_code, txt['LANG_CODES']
@@ -79,7 +79,7 @@ def cmd_start(update, context):
 
 def cmd_help(update, context):
     """ Handler: command /help """
-    user = User.get_user(update.message.chat_id)
+    user = User.get_user(update.message.from_user.id)
 
     context.bot.send_message(
         user.user_id, txt['SERVICE']['help'][user.settings.language]
@@ -88,7 +88,7 @@ def cmd_help(update, context):
 
 def cmd_cancel(update, context):
     """ Handler: command /cancel """
-    user = User.get_user(update.message.chat_id)
+    user = User.get_user(update.message.from_user.id)
 
     # reset user fsm_state:
     user.settings.fsm_state = FSM.START.value
@@ -97,3 +97,19 @@ def cmd_cancel(update, context):
     context.bot.send_message(
         user.user_id, txt['SERVICE']['cancel'][user.settings.language]
     )
+
+
+def cmd_done(update, context):
+    """ Handler: command /done """
+    # in this handler, we are changing user FSM states
+    # therefore, we first have to check them.
+    user = User.get_user(update.message.from_user.id)
+    end_fsm_states = ['2.1']
+
+    if user.settings.fsm_state not in end_fsm_states:
+        # TODO: delete message instead of return
+        return
+
+    if user.settings.fsm_state == '2.1':
+        # TODO: implement a menu.
+        pass
