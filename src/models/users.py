@@ -8,16 +8,27 @@ from datetime import datetime
 
 
 class Settings(EmbeddedDocument):
+    """
+    Sub-document containgin User settings data.
+    """
     language = StringField(required=True)
     fsm_state = StringField(default='0', regex="(\\d\\.)*\\d")
 
 
 class Subscribed(EmbeddedDocument):
+    """
+    Sub-document containing data that describes which services
+    a User is subscribed to.
+    """
     # every field here must have a default
     rss_list = ListField(ReferenceField('RSS'), default=list)
 
 
 class User(Document):
+    """
+    User class that contains all necessary information about individual users
+    of the service.
+    """
     user_id = IntField(unique=True, required=True)
     registered = DateTimeField(default=datetime.now)
     premium = BooleanField(required=True, default=False)
@@ -31,15 +42,21 @@ class User(Document):
     }
 
     def clean(self):
+        """
+        Overrides the clean method that is activated as the document is saved.
+        This method currently creates an empty 'Subscribed' EmbeddedDocument
+        as the User object is being created.
+        """
         if not self.subscribed:
             self.subscribed = Subscribed()
 
     def add_to_invited(self, payload: int):
         """
+        Adds a foreign user_id to as the invitor of self (User)
+
         :param received: user_id of the user to whom we are adding
         :param payload: the user_id we are adding
         """
-        # TODO: add a user_id to invited list
         if payload in self.users_invited or self.user_id == payload:
             return
 
@@ -57,9 +74,11 @@ class User(Document):
         """
         user = cls.objects(user_id=uid)
 
-        # TODO: should raise two different errors
-        if len(user) == 0 or len(user) > 1:
+        if len(user) == 0:
             raise LookupError(f"User {uid} not found.")
+
+        if len(user) > 1:
+            raise LookupError(f"More than 1 user with id: {uid} was found.")
 
         # return the single element form the list
         return user[0]
@@ -84,5 +103,9 @@ class User(Document):
 
     @classmethod
     def retrieve_total(cls) -> int:
-        """ Retrieves the total amount of users """
+        """
+        Retrieves the total amount of users
+
+        :return: total amount of users
+        """
         return cls.objects.count()
