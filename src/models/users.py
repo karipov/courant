@@ -22,6 +22,7 @@ class Subscribed(EmbeddedDocument):
     """
     # every field here must have a default
     rss_list = ListField(ReferenceField('RSS'), default=list)
+    channel_list = ListField(ReferenceField('Channel'), default=list)
 
 
 class User(Document):
