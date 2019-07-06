@@ -16,6 +16,7 @@ import logging
 
 from mongoengine import errors
 from telegram.message import MessageEntity
+from telegram import TelegramError
 
 
 def master(update, context):
@@ -25,6 +26,21 @@ def master(update, context):
     """
     db_user = User.get_user(update.message.from_user.id)
     user_state = db_user.settings.fsm_state
+
+    allowed_states = ['2.1', '2.2']
+    if user_state not in allowed_states:
+        try:
+            context.bot.delete_message(
+                chat_id=update.message.from_user.id,
+                message_id=update.message.message_id,
+            )
+        except TelegramError:
+            context.bot.edit_message_text(
+                chat_id=update.message.from_user.id,
+                message_id=update.message.message_id,
+                text=txt['CALLBACK']['deleted'][db_user.settings.language]
+            )
+        return
 
     fsm_options = {
         '2.1': manual_compile,
