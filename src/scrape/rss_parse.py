@@ -4,6 +4,7 @@ from feedparser import FeedParserDict
 
 def parse_url(url: str) -> FeedParserDict:
     """ Proxy function """
+    # feedparser.registerDateHandler(omniscent_date_handler)
     return feedparser.parse(url)
 
 
@@ -21,6 +22,8 @@ def check_source(parsed: FeedParserDict) -> bool:
     if not parsed.encoding.upper() == 'utf-8'.upper():
         return False
 
+    return True
+
 
 def check_parsed(parsed: FeedParserDict, req_keys: list) -> bool:
     """
@@ -30,7 +33,7 @@ def check_parsed(parsed: FeedParserDict, req_keys: list) -> bool:
     :req_keys: keys that the `parsed` must contain
     :return: whether the parsed has the needed elements
     """
-    return all([x in parsed.feed for x in req_keys])
+    return all([parsed.get(x) is not None for x in req_keys])
 
 
 # --- testing area ---
@@ -43,29 +46,3 @@ if __name__ == "__main__":
     rss = json.load(open(Path.cwd().joinpath(
         'src/scrape/news-feed-list-of-countries.json'
         )))
-
-    total_etag = 0
-    total_bozo = 0
-    total_sources = 0
-    good_sources = 0
-
-    print(f"Total countries: {len(rss.keys())}")
-    print()
-
-    for country in rss.keys():
-        country = 'UZ'
-        # print(f"New country: {rss[country]['name']}")
-
-        for feed_data in rss[country]['sources']:
-            info = parse_url(feed_data['feedlink'])
-
-            if info.bozo == 1:
-                continue
-
-            if any([info.get('etag'), info.get('updated_parsed')]):
-                continue
-
-            if not len(info.entries) >= 1:
-                continue
-
-            print(type(info.entries[0]))
