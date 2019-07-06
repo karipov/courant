@@ -13,6 +13,8 @@ from .shared import txt, FSM
 from models import User, Settings
 import utility
 
+import html
+
 
 markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANG_PAYLOAD'])
 
@@ -111,5 +113,30 @@ def cmd_done(update, context):
         return
 
     if user.settings.fsm_state == '2.1':
-        # TODO: implement a menu.
-        pass
+        user.settings.fsm_state = FSM.DONE.value
+        user.save()
+
+        data = {
+            "link": f"tg://user?id={update.message.from_user.id}",
+            "name": html.escape(update.message.from_user.first_name),
+            "rss_num": len(user.subscribed.rss_list),
+            "channel_num": len(user.subscribed.channel_list),
+            "time": user.registered.strftime("%Y-%m-%d")
+        }
+
+        new_content = (
+            f"{txt['FSM'][FSM.DONE.value]['text'][user.settings.language]}"
+            .format(**data)
+        )
+
+        keyboard = utility.gen_keyboard(
+            txt['FSM'][FSM.DONE.value]['markup'][user.settings.language],
+            txt['FSM'][FSM.DONE.value]['payload']
+        )
+
+        context.bot.send_message(
+            chat_id=update.message.from_user.id,
+            text=new_content,
+            reply_markup=keyboard,
+            parse_mode='HTML'
+        )
