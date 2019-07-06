@@ -122,6 +122,31 @@
             }
         },
 
+        "3": {
+            "text": {
+                "en": "<i>Menu</i>\n\n<a href=\"{link}\">{name}</a> is currently subscribed to <code>{rss_num}</code> RSS feeds, <code>{channel_num}</code> Telegram Channels and using this service since <code>{time}</code>"
+            },
+            "markup": {
+                "en": ["✎ RSS", "✎ Channels", "General Settings"]
+            },
+            "payload": ["fsm:3.1:rss", "fsm:3.2:channels", "fsm:3.3:general"]
+        },
+        "3.1": {
+            "text": "<i>Modify RSS</i>\nHow would you like to modify your RSS feeds?",
+            "markup": ["« Back"],
+            "payload": ["fsm:3:back"]
+        },
+        "3.2": {
+            "text": "<i>Modify Channels</i>\nHow would you like to modify your Telegram Channels?",
+            "markup": ["« Back"],
+            "payload": ["fsm:3:back"]
+        },
+        "3.3": {
+            "text": "<i>General Settings</i>:",
+            "markup": ["« Back"],
+            "payload": ["fsm:3:back"]
+        },
+
         "TREE": {
             "name": "1",
             "children": [
@@ -142,6 +167,21 @@
                             ]
                         }
                     ]
+                }
+            ]
+        },
+
+        "DONE_TREE": {
+            "name": "3",
+            "children": [
+                {
+                    "name": "3.1"
+                },
+                {
+                    "name": "3.2"
+                },
+                {
+                    "name": "3.3"
                 }
             ]
         }
