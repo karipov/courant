@@ -26,6 +26,9 @@ def master_callback(update, context):
 
     user_state = db_user.settings.fsm_state
 
+    # TODO: now that there are two trees, improve the checking
+    # TODO: maybe abandon the 'FSM' and split into 'SET' (for set-up
+    # and anything from states 1-2) and 'FIN' (for anything after state 3)
     checked = utility.check_fsm(
         current=user_state,
         future=data_filter[1],
@@ -44,6 +47,9 @@ def master_callback(update, context):
         # if a button is clicked here, it's the "back" button
         '2.1': general_callback,
         '2.2': general_callback,
+        '3.1': general_callback,
+        '3.2': general_callback,
+        '3.3': general_callback
     }
 
     logging.debug(f"current user state (db - exec.): {user_state}")
