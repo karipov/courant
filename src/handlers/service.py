@@ -102,14 +102,19 @@ def cmd_cancel(update, context):
 
 
 def cmd_done(update, context):
-    """ Handler: command /done """
+    """
+    Handler: command /done
+    This command is, and can only be, called when the user is finished with
+    the set-up process.
+    """
     # in this handler, we are changing user FSM states
     # therefore, we first have to check them.
+
     user = User.get_user(update.message.from_user.id)
     end_fsm_states = ['2.1']
 
     if user.settings.fsm_state not in end_fsm_states:
-        # TODO: delete message instead of return
+        context.bot.delete_message(user.user_id, update.message.message_id)
         return
 
     if user.settings.fsm_state == '2.1':
