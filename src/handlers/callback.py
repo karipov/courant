@@ -17,14 +17,23 @@ def master_callback(update, context):
     """
     query = update.callback_query
     db_user = User.get_user(query.from_user.id)
+    user_state = db_user.settings.fsm_state
     data_filter = query.data.split(config['TELEGRAM']['delim'])
 
-    if data_filter[0] != 'fsm':
-        # haven't dealt with anything that isn't FSM yet, so just
-        # quit if we see a problem.
+    # select different trees depending on the data in the callback
+    # Why? because it's useful to separate the actions at and post
+    # the setup process for a user.
+    if data_filter[0] == 'set':
+        tree = txt['FSM']['TREE']
+    elif data_filter[0] == 'fin':
+        tree = txt['FSM']['DONE_TREE']
+    else:
+        logging.debug("OOPS, RETURN REACHED")
+        logging.debug(f"{data_filter}")
+        # TODO: delete whatever message had faulty callback data
+        # will be helpful if any time we have an update to the
+        # callback data naming scheme.
         return
-
-    user_state = db_user.settings.fsm_state
 
     # TODO: now that there are two trees, improve the checking
     # TODO: maybe abandon the 'FSM' and split into 'SET' (for set-up
@@ -32,7 +41,7 @@ def master_callback(update, context):
     checked = utility.check_fsm(
         current=user_state,
         future=data_filter[1],
-        tree=txt['FSM']['TREE']
+        tree=tree
         )
 
     if not checked:
@@ -47,6 +56,8 @@ def master_callback(update, context):
         # if a button is clicked here, it's the "back" button
         '2.1': general_callback,
         '2.2': general_callback,
+
+        '3': general_callback,
         '3.1': general_callback,
         '3.2': general_callback,
         '3.3': general_callback
@@ -89,21 +100,23 @@ def general_callback(update, context, user):
     features such as extracting the future FSM state, and setting it for the
     user.
     """
-    query = update.callback_query
-    state = query.data.split(config['TELEGRAM']['delim'])[1]
+    query = update.callback_query  # shorter var name
+    future_state = query.data.split(config['TELEGRAM']['delim'])[1]
 
+    # telegram requires the server to "answer" a callback query
     context.bot.answer_callback_query(query.id)
 
-    user.settings.fsm_state = state
+    # the "future" FSM state now becomes the "current" FSM state
+    user.settings.fsm_state = future_state
     user.save()
 
     new_content = (
-        f"{txt['FSM'][state]['text'][user.settings.language]}"
+        f"{txt['FSM'][future_state]['text'][user.settings.language]}"
     )
 
     keyboard = utility.gen_keyboard(
-        txt['FSM'][state]['markup'][user.settings.language],
-        txt['FSM'][state]['payload']
+        txt['FSM'][future_state]['markup'][user.settings.language],
+        txt['FSM'][future_state]['payload']
     )
 
     # edit the message to display the selected language
@@ -116,6 +129,7 @@ def general_callback(update, context, user):
 
 def cmd_entry_type(update, context, user):
     """ Handler: fsm:1 -> fsm:2 """
+    # custom handler needed to ensure language set-up
     query = update.callback_query
     chosen_language_code = query.data.split(config['TELEGRAM']['delim'])[2]
 
