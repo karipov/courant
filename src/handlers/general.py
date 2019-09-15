@@ -27,7 +27,12 @@ def master(update, context):
     db_user = User.get_user(update.message.from_user.id)
     user_state = db_user.settings.fsm_state
 
+    # the reason why a list such as this is used instead of a tree, such as the
+    # one used in callback.py (master_callback) is due to the fact that
+    # messages don't carry future state information -> but they don't need to.
+    # this is done in the functions.
     allowed_states = ['2.1', '2.2']
+
     if user_state not in allowed_states:
         try:
             context.bot.delete_message(
@@ -57,6 +62,9 @@ def general_compile(update, context, user):
     This could be useful in case the need arises to add more services,
     which will all basically use the same backend or same pieces of code.
     """
+    # TODO: this will need an extra parameter to indicate the "future" FSM
+    # state that needs to be set, because messages don't tend to carry
+    # this information.
     raise NotImplementedError()
 
 
