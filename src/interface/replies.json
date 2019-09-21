@@ -104,6 +104,16 @@
             "payload": ["set:2:back"]
         },
 
+        "2.1b": {
+            "text": {
+                "en": "{} has been successfully added to the list of RSS Feeds. Press the button below when done."
+            },
+            "markup": {
+                "en": ["Done"]
+            },
+            "payload": ["set:3:done"]
+        },
+
         "2.2": {
             "text": {
                 "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>"

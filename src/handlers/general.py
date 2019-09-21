@@ -8,9 +8,10 @@ Currently contains handlers for:
 Currently contains filters for:
 - text messages with certain FSM states
 """
-from .shared import txt, config
+from .shared import txt, config, FSM
 from models import User, RSS
 from scrape import rss_parse
+import utility
 
 import logging
 
@@ -76,6 +77,7 @@ def manual_compile(update, context, user):
         types=['mention', 'url']
     )
 
+    # TODO: remove below (?)
     logging.debug(f"Entities @ Manual Mode: {entities}")
 
     if not entities:
@@ -95,19 +97,19 @@ def manual_compile(update, context, user):
 
 def rss_compile(update, context, user, link):
     """
-    Handler: fsm:2.1 -> ___
+    Handler: fsm:2.1 -> 3
 
     :param user: mongoengine User object
     :param link: the extracted entity from the message
     """
-    # TODO: /done command should finish the compilation
     news = rss_parse.parse_url(link)
+    language = user.settings.language
 
     # check the source for possible errors, such as bozo and format
     if not rss_parse.check_source(news):
         context.bot.send_message(
             chat_id=user.user_id,
-            text=txt['CALLBACK']['error_link'][user.settings.language]
+            text=txt['CALLBACK']['error_link'][language]
         )
         return
 
@@ -121,7 +123,7 @@ def rss_compile(update, context, user, link):
     if not checked_feed:
         context.bot.send_message(
             chat_id=user.user_id,
-            text=txt['CALLBACK']['error_feed'][user.settings.language]
+            text=txt['CALLBACK']['error_feed'][language]
         )
         return
 
@@ -138,7 +140,7 @@ def rss_compile(update, context, user, link):
     if not checked_all_entries:
         context.bot.send_message(
             chat_id=user.user_id,
-            text=txt['CALLBACK']['error_entries'][user.settings.language]
+            text=txt['CALLBACK']['error_entries'][language]
         )
         return
 
@@ -156,7 +158,7 @@ def rss_compile(update, context, user, link):
     except errors.NotUniqueError:
         context.bot.send_message(
             chat_id=user.user_id,
-            text=txt['CALLBACK']['repeated_rss'][user.settings.language]
+            text=txt['CALLBACK']['repeated_rss'][language]
         )
         return
 
@@ -165,11 +167,13 @@ def rss_compile(update, context, user, link):
 
     feed_formatted = f"<a href=\"{db_news.link}\">{db_news.title}</a>"
 
+    # TODO: fix txt from CALLBACK to FSM
+    # does this mean other changes such as tree checking?
     if not len(news.entries) > 0:
         context.bot.send_message(
             chat_id=user.user_id,
             text=feed_formatted +
-            txt['CALLBACK']['empty_feed'][user.settings.language],
+            txt['CALLBACK']['empty_feed'][language],
             parse_mode='HTML'
         )
         return
@@ -179,9 +183,14 @@ def rss_compile(update, context, user, link):
 
     context.bot.send_message(
         chat_id=user.user_id,
-        text=feed_formatted +
-        txt['CALLBACK']['rss_success'][user.settings.language],
-        parse_mode='HTML'
+        text=txt['FSM'][FSM.FINISH_MANUAL.value]['text'][language].format(
+            feed_formatted
+        ),
+        parse_mode='HTML',
+        reply_markup=utility.gen_keyboard(
+            txt['FSM'][FSM.FINISH_MANUAL.value]['markup'][language],
+            txt['FSM'][FSM.FINISH_MANUAL.value]['payload']
+        )
     )
 
     # TODO: add "Send <smth> when done"
