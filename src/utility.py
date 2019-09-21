@@ -3,10 +3,6 @@ Helper module for various functionality
 """
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
-from anytree.importer import DictImporter
-from anytree.search import findall
-from anytree import Node
-
 
 def extract_payload(text: str, num_values=1, delim=' ') -> list:
     """
@@ -60,15 +56,47 @@ def check_fsm(current: str, future: str, tree: dict) -> bool:
     :param tree: the order in which the FSM must be executed
     :return: whether or not user is doing a legal operation
     """
-    root = DictImporter(nodecls=Node).import_(tree)
-    nodes = findall(root, filter_=lambda node: node.name in (current, future))
+    # recusrive function
+    def lookup(tree, a, b, flag=False):
+        if tree['name'] == b and flag:
+            return True
+        return any(lookup(
+            j, a, b, tree['name'] == a
+            ) for j in tree.get('children', []))
 
-    if len(nodes) != 2:
-        return False
+    return any([lookup(tree, current, future), lookup(tree, future, current)])
 
-    # this is to support 'back' functionality
-    # checks if the nodes are parent-child related
-    if nodes[0].parent == nodes[1] or nodes[1].parent == nodes[0]:
-        return True
 
-    return False
+# testing area:
+if __name__ == "__main__":
+    tree = {
+        "name": "1",
+        "children": [
+            {
+                "name": "2",
+                "children": [
+                    {
+                        "name": "2.1",
+                        "children": [{"name": "3"}]
+                    },
+                    {
+                        "name": "2.2",
+                        "children": [
+                            {
+                                "name": "2.2.1",
+                                "children": [{"name": "3"}]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+    current = "2.2.1"
+    future = "2.2"
+
+    print(check_fsm(
+        current=current,
+        future=future,
+        tree=tree
+    ))
