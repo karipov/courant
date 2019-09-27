@@ -13,6 +13,8 @@ from .shared import txt, FSM
 from models import User, Settings
 import utility
 
+import html
+
 
 markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANG_PAYLOAD'])
 
@@ -100,47 +102,47 @@ def cmd_cancel(update, context):
 
 
 # TODO: salvage usable code; delete the rest.
-# def cmd_done(update, context):
-#     """
-#     Handler: command /done
-#     This command is, and can only be, called when the user is finished with
-#     the set-up process.
-#     """
-#     # in this handler, we are changing user FSM states
-#     # therefore, we first have to check them.
+def cmd_done(update, context):
+    """
+    Handler: command /done
+    This command is, and can only be, called when the user is finished with
+    the set-up process.
+    """
+    # in this handler, we are changing user FSM states
+    # therefore, we first have to check them.
 
-#     user = User.get_user(update.message.from_user.id)
-#     end_fsm_states = ['2.1']
+    user = User.get_user(update.message.from_user.id)
+    end_fsm_states = ['2.1']
 
-#     if user.settings.fsm_state not in end_fsm_states:
-#         context.bot.delete_message(user.user_id, update.message.message_id)
-#         return
+    if user.settings.fsm_state not in end_fsm_states:
+        context.bot.delete_message(user.user_id, update.message.message_id)
+        return
 
-#     if user.settings.fsm_state == '2.1':
-#         user.settings.fsm_state = FSM.DONE.value
-#         user.save()
+    if user.settings.fsm_state == '2.1':
+        user.settings.fsm_state = FSM.DONE.value
+        user.save()
 
-#         data = {
-#             "link": f"tg://user?id={update.message.from_user.id}",
-#             "name": html.escape(update.message.from_user.first_name),
-#             "rss_num": len(user.subscribed.rss_list),
-#             "channel_num": len(user.subscribed.channel_list),
-#             "time": user.registered.strftime("%Y-%m-%d")
-#         }
+        data = {
+            "link": f"tg://user?id={update.message.from_user.id}",
+            "name": html.escape(update.message.from_user.first_name),
+            "rss_num": len(user.subscribed.rss_list),
+            "channel_num": len(user.subscribed.channel_list),
+            "time": user.registered.strftime("%Y-%m-%d")
+        }
 
-#         new_content = (
-#             f"{txt['FSM'][FSM.DONE.value]['text'][user.settings.language]}"
-#             .format(**data)
-#         )
+        new_content = (
+            f"{txt['FSM'][FSM.DONE.value]['text'][user.settings.language]}"
+            .format(**data)
+        )
 
-#         keyboard = utility.gen_keyboard(
-#             txt['FSM'][FSM.DONE.value]['markup'][user.settings.language],
-#             txt['FSM'][FSM.DONE.value]['payload']
-#         )
+        keyboard = utility.gen_keyboard(
+            txt['FSM'][FSM.DONE.value]['markup'][user.settings.language],
+            txt['FSM'][FSM.DONE.value]['payload']
+        )
 
-#         context.bot.send_message(
-#             chat_id=update.message.from_user.id,
-#             text=new_content,
-#             reply_markup=keyboard,
-#             parse_mode='HTML'
-#         )
+        context.bot.send_message(
+            chat_id=update.message.from_user.id,
+            text=new_content,
+            reply_markup=keyboard,
+            parse_mode='HTML'
+        )

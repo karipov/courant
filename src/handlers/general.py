@@ -13,8 +13,6 @@ from models import User, RSS
 from scrape import rss_parse
 import utility
 
-import logging
-
 from mongoengine import errors
 from telegram.message import MessageEntity
 from telegram import TelegramError
@@ -76,9 +74,6 @@ def manual_compile(update, context, user):
     entities = update.message.parse_entities(
         types=['mention', 'url']
     )
-
-    # TODO: remove below (?)
-    logging.debug(f"Entities @ Manual Mode: {entities}")
 
     if not entities:
         context.bot.send_message(

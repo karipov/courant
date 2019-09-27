@@ -31,6 +31,7 @@ def error(update, context):
 dispatcher.add_handler(CommandHandler('admin', admin.cmd_admin))
 dispatcher.add_handler(CommandHandler('start', service.cmd_start))
 dispatcher.add_handler(CommandHandler('cancel', service.cmd_cancel))
+dispatcher.add_handler(CommandHandler('done', service.cmd_done))
 dispatcher.add_handler(CommandHandler('help', service.cmd_help))
 
 # adding message habdlers
