@@ -59,7 +59,11 @@
         },
 
         "rss_success": {
-            "en": " has been successfuly added to your list of RSS feeds."
+            "en": " has been added to your list of RSS feeds."
+        },
+
+        "deleted_rss": {
+            "en": "{} has been deleted from your list of RSS feeds."
         }
     },
 
@@ -132,6 +136,7 @@
             }
         },
 
+
         "3": {
             "text": {
                 "en": "<i>Menu</i>\n\n<a href=\"{link}\">{name}</a> is currently subscribed to <code>{rss_num}</code> RSS feeds, <code>{channel_num}</code> Telegram Channels and using this service since <code>{time}</code>"
@@ -143,16 +148,25 @@
         },
         "3.1": {
             "text": {
-                "en": "<i>Modify RSS</i>\nHow would you like to modify your RSS feeds?"
+                "en": "<i>Modify RSS</i>\n\nHow would you like to modify your RSS feeds?"
+            },
+            "markup": {
+                "en": ["« Back", "Delete"]
+            },
+            "payload": ["fin:3:back", "fin:3.1.1:delete"]
+        },
+        "3.1.1": {
+            "text": {
+                "en": "<i>Delete</i>\n\nPlease click on the RSS Feeds you'd like to unsubscribe from."
             },
             "markup": {
                 "en": ["« Back"]
             },
-            "payload": ["fin:3:back"]
+            "payload": ["fin:3.1:back"]
         },
         "3.2": {
             "text": {
-                "en": "<i>Modify Channels</i>\nHow would you like to modify your Telegram Channels?"
+                "en": "<i>Modify Channels</i>\n\nHow would you like to modify your Telegram Channels?"
             },
             "markup": {
                 "en": ["« Back"]
@@ -161,7 +175,7 @@
         },
         "3.3": {
             "text": {
-                "en": "<i>General Settings</i>:"
+                "en": "<i>General Settings</i>"
             },
             "markup": {
                 "en": ["« Back"]
@@ -197,7 +211,8 @@
             "name": "3",
             "children": [
                 {
-                    "name": "3.1"
+                    "name": "3.1",
+                    "children": [{"name": "3.1.1"}]
                 },
                 {
                     "name": "3.2"
