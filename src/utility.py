@@ -56,6 +56,12 @@ def check_fsm(current: str, future: str, tree: dict) -> bool:
     :param tree: the order in which the FSM must be executed
     :return: whether or not user is doing a legal operation
     """
+    # it's ok for a user to remain in the same state after multiple actions
+    # such as the deletion of RSS feeds in the same menu.
+    # therefore, we allow for the below to proceed
+    if current == future:
+        return True
+
     # recusrive function
     def lookup(tree, a, b, flag=False):
         if tree['name'] == b and flag:
