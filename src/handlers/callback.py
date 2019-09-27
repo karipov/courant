@@ -18,31 +18,31 @@ def master_callback(update, context):
     query = update.callback_query
     db_user = User.get_user(query.from_user.id)
     user_state = db_user.settings.fsm_state
-    data_filter = query.data.split(config['TELEGRAM']['delim'])
+    data_filter = query.data.split(config['CB_DATA']['delim'])
 
     # select different trees depending on the data in the callback
     # Why? because it's useful to separate the actions at and post
     # the setup process for a user.
-    if data_filter[0] == 'set':
+    if data_filter[0] == config['CB_DATA']['setup']:
         tree = txt['FSM']['TREE']
-    elif data_filter[0] == 'fin':
+    elif data_filter[0] == config['CB_DATA']['post_setup']:
         tree = txt['FSM']['DONE_TREE']
+    # elif data_filter[0] == config['CB_DATA']['operations']:
+    #     # has nothing to do with FSM
+    #     operations_callback(update, context, db_user)
+    #     return
     else:
-        logging.debug("OOPS, RETURN REACHED")
-        logging.debug(f"{data_filter}")
-        # TODO: delete whatever message had faulty callback data
-        # will be helpful if any time we have an update to the
-        # callback data naming scheme.
+        alert_restart(update, context, db_user)
         return
 
-    # TODO: now that there are two trees, improve the checking
-    # TODO: maybe abandon the 'FSM' and split into 'SET' (for set-up
-    # and anything from states 1-2) and 'FIN' (for anything after state 3)
     checked = utility.check_fsm(
         current=user_state,
         future=data_filter[1],
         tree=tree
         )
+
+    logging.debug(f"current user state (db - exec.): {user_state}")
+    logging.debug(f"future user state (json): {data_filter[1]}")
 
     if not checked:
         alert_restart(update, context, db_user)
@@ -53,22 +53,39 @@ def master_callback(update, context):
         '1': cmd_entry_type,
         '2': manual_explore_entry,
 
-        # if a button is clicked here, it's the "back" button
         '2.1': general_callback,
         '2.2': general_callback,
 
         '3': general_callback,
-        '3.1': general_callback,
+        '3.1': modify_rss_callback,
+        '3.1.1': delete_rss_callback,
         '3.2': general_callback,
         '3.3': general_callback
     }
 
-    logging.debug(f"current user state (db - exec.): {user_state}")
-    logging.debug(f"future user state (json): {data_filter[1]}")
-
     fsm_options[user_state](update, context, db_user)
 
 
+def operations_callback(update, context, user):
+    """
+    papa operations
+
+    this function should be focused on operating the main functionalities of
+    the bot, such as
+
+    1. Question: maybe just use the master_callback structure and get the
+    extra information through the string in the third delimeter?
+
+    i.e. fin:3.1.2:delete0
+
+    delete0 is the information. or is it worth having a separate function
+    such as this???
+    """
+    # TODO: fix this mofo!!
+    raise NotImplementedError()
+
+
+# TODO: rename, as this now actually deletes the message
 def alert_restart(update, context, user):
     """
     If a user decides to click a button they aren't supposed to, then this
@@ -142,3 +159,76 @@ def cmd_entry_type(update, context, user):
 def manual_explore_entry(update, context, user):
     """ Handler fsm:2 -> fsm:2.1 | fsm:2.2"""
     general_callback(update, context, user)
+
+
+def modify_rss_callback(update, context, user):
+    """ Handler fsm:3.1 -> fsm:3 | fsm:3.1.1"""
+    # TODO: finish the "generation" of a modification list
+    # introduce another handler for fsm:3.1.1 that actually
+    # handles the deletion
+    query = update.callback_query
+    future_state = query.data.split(config['CB_DATA']['delim'])[1]
+
+    if future_state == "3":
+        general_callback(update, context, user)
+        return
+
+    # TODO: I beliebe telegram allows only a certain number of
+    # items as buttons... Maybe having more should be a #premium feature
+    inline = [[item.title, f"fin:3.1.1:{i}"] for i, item in enumerate(
+        user.subscribed.rss_list
+    )]
+    # adding the "Back" button. since only one button we use index 0
+    inline.append([
+        txt['FSM'][future_state]['markup'][user.settings.language][0],
+        txt['FSM'][future_state]['payload'][0]
+    ])
+    label, data = zip(*inline)
+
+    logging.debug(f"!!!!{data}!!!!")
+
+    keyboard = utility.gen_keyboard(
+        label=label,
+        data=data,
+        width=2
+    )
+
+    query.edit_message_text(
+        text=txt['FSM'][future_state]['text'][user.settings.language],
+        reply_markup=keyboard,
+        parse_mode='HTML'
+    )
+
+    user.settings.fsm_state = "3.1.1"
+    user.save()
+
+
+def delete_rss_callback(update, context, user):
+    """ Handler fsm:3.1.1 -> Delete RSS | 3.1 """
+    query = update.callback_query
+    future_state = query.data.split(config['CB_DATA']['delim'])[1]
+
+    if future_state == "3.1":
+        general_callback(update, context, user)
+        return
+
+    # TODO: error check here.
+    resource_delete_id = int(query.data.split(config['CB_DATA']['delim'])[-1])
+
+    context.bot.answer_callback_query(
+        callback_query_id=query.id,
+        text=txt['CALLBACK']['deleted_rss'][user.settings.language].format(
+            user.subscribed.rss_list[resource_delete_id].title
+        ),
+        alert=True
+    )
+
+    # deletes the RSS resource
+    del user.subscribed.rss_list[resource_delete_id]
+    logging.debug("\n\n!!!!! deleted RSS resource\n")
+    user.save()
+
+    # TODO: update the message with new buttons
+    # if the user has 0 feeds, they will be only shown the back button, so
+    # no chance of an infinite loop...?
+    modify_rss_callback(update, context, user)
