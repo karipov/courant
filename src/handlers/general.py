@@ -140,9 +140,11 @@ def rss_compile(update, context, user, link):
         return
 
     # if all the checks have so far been passed, then we create the RSS
-    # feed in our database and register it - unless it already exists.
+    # feed in our database and register it - unless it already exists for the
+    # user.
     try:
         db_news = RSS(
+            rss_link=link,
             link=news.feed.link,
             title=news.feed.title,
             subtitle=news.feed.get('subtitle', ''),
@@ -150,12 +152,20 @@ def rss_compile(update, context, user, link):
         )
         db_news.subscribed.append(user.user_id)
         db_news.save()
+
+    # if an identical RSS feed exists instead of saving, we fetch the existing
     except errors.NotUniqueError:
-        context.bot.send_message(
-            chat_id=user.user_id,
-            text=txt['CALLBACK']['repeated_rss'][language]
-        )
-        return
+        db_news = RSS.get_rss(rss_link=link)
+
+        if user.user_id in db_news.subscribed:
+            context.bot.send_message(
+                chat_id=user.user_id,
+                text=txt['CALLBACK']['repeated_rss'][language]
+            )
+            return
+
+        db_news.subscribed.append(user.user_id)
+        db_news.save()
 
     user.subscribed.rss_list.append(db_news.pk)
     user.save()

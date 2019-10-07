@@ -214,6 +214,13 @@ def delete_rss_callback(update, context, user):
 
     # TODO: error check here.
     resource_delete_id = int(query.data.split(config['CB_DATA']['delim'])[-1])
+    rss_resource = user.subscribed.rss_list[resource_delete_id]
+
+    # if the RSS feed has only one subscribed, then we delete the entire feed
+    if len(rss_resource.subscribed) == 1:
+        rss_resource.delete()
+    else:
+        rss_resource.subscribed.remove(user.user_id)
 
     context.bot.answer_callback_query(
         callback_query_id=query.id,
@@ -223,7 +230,7 @@ def delete_rss_callback(update, context, user):
         alert=True
     )
 
-    # deletes the RSS resource
+    # deletes the RSS resource from User's document
     del user.subscribed.rss_list[resource_delete_id]
     logging.debug("\n\n!!!!! deleted RSS resource\n")
     user.save()
