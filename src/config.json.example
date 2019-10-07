@@ -1,10 +1,30 @@
 {
     "TELEGRAM": {
-        "token": "",
-        "admin": [...]
+        "token": "API_TOKEN_HERE",
+        "admin": [ADMIN_USER_ID_HERE],
+        "delim": ":"
+    },
+
+    "CB_DATA": {
+        "delim": ":",
+        "setup": "set",
+        "post_setup": "fin",
+        "operations": "ops"
     },
 
     "MONGO": {
-        "name": ""
-    }
+        "name": "courant",
+        "dev_mode": true
+    },
+
+    "SCRAPE": {
+        "RSS": {
+            "req_feed_keys": ["title", "link"],
+            "req_entry_keys": ["title", "link"],
+            "entry_defaults": {
+                "summary": null,
+                "author": null
+            }
+        }
+    } 
 }
