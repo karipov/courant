@@ -8,14 +8,13 @@ Currently contains handlers for:
 Currently contains filters for:
 - text messages with certain FSM states
 """
-from .shared import txt, config, FSM
+from .shared import txt, config, remove_message, FSM
 from models import User, RSS
 from scrape import rss_parse
 import utility
 
 from mongoengine import errors
 from telegram.message import MessageEntity
-from telegram import TelegramError
 
 
 def master(update, context):
@@ -33,17 +32,7 @@ def master(update, context):
     allowed_states = ['2.1', '2.2']
 
     if user_state not in allowed_states:
-        try:
-            context.bot.delete_message(
-                chat_id=update.message.from_user.id,
-                message_id=update.message.message_id,
-            )
-        except TelegramError:
-            context.bot.edit_message_text(
-                chat_id=update.message.from_user.id,
-                message_id=update.message.message_id,
-                text=txt['CALLBACK']['deleted'][db_user.settings.language]
-            )
+        remove_message(update, context, db_user)
         return
 
     fsm_options = {
@@ -197,10 +186,6 @@ def rss_compile(update, context, user, link):
             txt['FSM'][FSM.FINISH_MANUAL.value]['payload']
         )
     )
-
-    # TODO: add "Send <smth> when done"
-    # TODO: remove RSS feed from db if it has no subscribers
-    # TODO: implement RSS feed removal
 
 
 def channel_compile(update, context, user):

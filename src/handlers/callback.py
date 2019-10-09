@@ -1,10 +1,8 @@
-from .shared import txt, config
+from .shared import txt, config, remove_message
 from models import User
 import utility
 
 import logging
-
-from telegram import TelegramError
 
 
 def master_callback(update, context):
@@ -32,7 +30,7 @@ def master_callback(update, context):
     #     operations_callback(update, context, db_user)
     #     return
     else:
-        alert_restart(update, context, db_user)
+        remove_message(update, context, db_user)
         return
 
     checked = utility.check_fsm(
@@ -45,7 +43,7 @@ def master_callback(update, context):
     logging.debug(f"future user state (json): {data_filter[1]}")
 
     if not checked:
-        alert_restart(update, context, db_user)
+        remove_message(update, context, db_user)
         return
 
     # pseudo-switch/case statement
@@ -64,51 +62,6 @@ def master_callback(update, context):
     }
 
     fsm_options[user_state](update, context, db_user)
-
-
-def operations_callback(update, context, user):
-    """
-    papa operations
-
-    this function should be focused on operating the main functionalities of
-    the bot, such as
-
-    1. Question: maybe just use the master_callback structure and get the
-    extra information through the string in the third delimeter?
-
-    i.e. fin:3.1.2:delete0
-
-    delete0 is the information. or is it worth having a separate function
-    such as this???
-    """
-    # TODO: fix this mofo!!
-    raise NotImplementedError()
-
-
-# TODO: rename, as this now actually deletes the message
-def alert_restart(update, context, user):
-    """
-    If a user decides to click a button they aren't supposed to, then this
-    function will notify them.
-
-    :param user: the MongoEngine User object.
-    """
-    query = update.callback_query
-
-    context.bot.answer_callback_query(query.id)
-
-    try:
-        context.bot.delete_message(
-            chat_id=query.from_user.id,
-            message_id=query.message.message_id
-        )
-    # if the message is older than 48h, you cannot delete it.
-    # however, you can edit any message at any time
-    except TelegramError:
-        query.edit_message_text(
-            text=txt['CALLBACK']['deleted'][user.settings.language],
-            parse_mode='HTML'
-        )
 
 
 def general_callback(update, context, user):
@@ -185,8 +138,6 @@ def modify_rss_callback(update, context, user):
     ])
     label, data = zip(*inline)
 
-    logging.debug(f"!!!!{data}!!!!")
-
     keyboard = utility.gen_keyboard(
         label=label,
         data=data,
@@ -216,11 +167,16 @@ def delete_rss_callback(update, context, user):
     resource_delete_id = int(query.data.split(config['CB_DATA']['delim'])[-1])
     rss_resource = user.subscribed.rss_list[resource_delete_id]
 
+    logging.debug(f"RSS RESOURCE: {rss_resource}")
+
     # if the RSS feed has only one subscribed, then we delete the entire feed
     if len(rss_resource.subscribed) == 1:
         rss_resource.delete()
     else:
+        logging.debug(f"TRYING TO RMEOVE USER_ID {user.user_id} FROM LIST \
+            {rss_resource.subscribed} - SUCCESS???")
         rss_resource.subscribed.remove(user.user_id)
+        rss_resource.save()
 
     context.bot.answer_callback_query(
         callback_query_id=query.id,
@@ -232,7 +188,6 @@ def delete_rss_callback(update, context, user):
 
     # deletes the RSS resource from User's document
     del user.subscribed.rss_list[resource_delete_id]
-    logging.debug("\n\n!!!!! deleted RSS resource\n")
     user.save()
 
     # TODO: update the message with new buttons
