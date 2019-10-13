@@ -55,10 +55,14 @@ def master_callback(update, context):
         '2.2': general_callback,
 
         '3': general_callback,
+
         '3.1': modify_rss_callback,
         '3.1.1': delete_rss_callback,
+
         '3.2': general_callback,
-        '3.3': general_callback
+
+        '3.3': general_callback,
+        '3.3.1': general_callback
     }
 
     fsm_options[user_state](update, context, db_user)

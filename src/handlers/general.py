@@ -8,7 +8,7 @@ Currently contains handlers for:
 Currently contains filters for:
 - text messages with certain FSM states
 """
-from .shared import txt, config, remove_message, FSM
+from .shared import txt, config, remove_message
 from models import User, RSS
 from scrape import rss_parse
 import utility
@@ -29,7 +29,7 @@ def master(update, context):
     # one used in callback.py (master_callback) is due to the fact that
     # messages don't carry future state information -> but they don't need to.
     # this is done in the functions.
-    allowed_states = ['2.1', '2.2']
+    allowed_states = ['2.1', '2.2', '3.3.1']
 
     if user_state not in allowed_states:
         remove_message(update, context, db_user)
@@ -37,7 +37,9 @@ def master(update, context):
 
     fsm_options = {
         '2.1': manual_compile,
-        '2.2': explore_compile
+        '2.2': explore_compile,
+
+        '3.3.1': manual_compile
     }
 
     fsm_options[user_state](update, context, db_user)
@@ -88,6 +90,7 @@ def rss_compile(update, context, user, link):
     """
     news = rss_parse.parse_url(link)
     language = user.settings.language
+    state = user.settings.fsm_state
 
     # check the source for possible errors, such as bozo and format
     if not rss_parse.check_source(news):
@@ -175,15 +178,18 @@ def rss_compile(update, context, user, link):
     db_news.last_entry_link = news.entries[0].link
     db_news.save()
 
+    # because this function is used both in the setup and post-setup, we assign
+    # a special 'b' sub-state that the user never takes on, but that contains
+    # the buttons required to move on to the next FSM state.
     context.bot.send_message(
         chat_id=user.user_id,
-        text=txt['FSM'][FSM.FINISH_MANUAL.value]['text'][language].format(
+        text=txt['FSM'][f'{state}b']['text'][language].format(
             feed_formatted
         ),
         parse_mode='HTML',
         reply_markup=utility.gen_keyboard(
-            txt['FSM'][FSM.FINISH_MANUAL.value]['markup'][language],
-            txt['FSM'][FSM.FINISH_MANUAL.value]['payload']
+            txt['FSM'][f'{state}b']['markup'][language],
+            txt['FSM'][f'{state}b']['payload']
         )
     )
 

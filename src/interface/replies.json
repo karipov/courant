@@ -110,7 +110,7 @@
 
         "2.1b": {
             "text": {
-                "en": "{} has been successfully added to the list of RSS Feeds. Press the button below when done."
+                "en": "{} has been successfully added to the list of your feeds. Press the button below when done."
             },
             "markup": {
                 "en": ["Done"]
@@ -175,13 +175,31 @@
         },
         "3.3": {
             "text": {
-                "en": "<i>General Settings</i>"
+                "en": "<i>General Settings</i>\n\nHow would you like to modify all of your feeds?"
+            },
+            "markup": {
+                "en": ["Add Feeds","« Back"]
+            },
+            "payload": ["fin:3.3.1:add_feeds","fin:3:back"]
+        },
+        "3.3.1": {
+            "text": {
+                "en": "<i>Add Feeds</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
             },
             "markup": {
                 "en": ["« Back"]
             },
-            "payload": ["fin:3:back"]
+            "payload": ["fin:3.3:back"]
         },
+        "3.3.1b": {
+            "text": {
+                "en": "{} has been successfully added to the list of your feeds. Press the button below when done."
+            },
+            "markup": {
+                "en": ["Done"]
+            },
+            "payload": ["fin:3.3:done"]
+            },
 
         "TREE": {
             "name": "1",
@@ -218,7 +236,8 @@
                     "name": "3.2"
                 },
                 {
-                    "name": "3.3"
+                    "name": "3.3",
+                    "children": [{"name": "3.3.1"}]
                 }
             ]
         }
