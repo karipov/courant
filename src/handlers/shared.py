@@ -23,11 +23,24 @@ class FSM(Enum):
 def remove_message(update, context, user):
     """
     If a user decides to click a button they aren't supposed to, then this
-    function will delete the message containing that button.
+    function will delete the message containing that button. Also, if a user
+    sends a message outside of the FSM, the message is deleted.
 
     :param user: the MongoEngine User object.
     """
     query = update.callback_query
+
+    # user messages (i.e. not clicking on buttons)
+    if not query:
+        try:
+            context.bot.delete_message(
+                chat_id=update.message.from_user.id,
+                message_id=update.message.message_id
+            )
+        except TelegramError:
+            # if we can't delete the message.. Oh well, nothing to do.
+            pass
+        return
 
     context.bot.answer_callback_query(query.id)
 
