@@ -2,11 +2,13 @@ from __future__ import annotations
 
 from mongoengine import Document
 from mongoengine import StringField, IntField, ListField, DateTimeField
+from mongoengine import BooleanField
 from datetime import datetime
 
 
 class RSS(Document):
     time_added = DateTimeField(default=datetime.utcnow)
+    fetched = BooleanField(default=True)
 
     rss_link = StringField(unique=True, required=True)
     link = StringField(unique=True, required=True)
@@ -16,7 +18,7 @@ class RSS(Document):
     summary = StringField(default=str)
     last_entry_link = StringField(required=True, default=str)
 
-    subscribed = ListField(IntField(), required=True, default=list)
+    subscribed = ListField(IntField(), default=list)
 
     meta = {
         'collection': 'rss',

@@ -157,6 +157,7 @@ def rss_compile(update, context, user, link):
             return
 
         db_news.subscribed.append(user.user_id)
+        db_news.fetched = True
         db_news.save()
 
     user.subscribed.rss_list.append(db_news.pk)
