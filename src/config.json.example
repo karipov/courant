@@ -1,6 +1,9 @@
 {
     "TELEGRAM": {
         "token": "API_TOKEN_HERE",
+        "api_id": API_ID_HERE,
+        "api_hash": "API_HASH_HERE",
+        "session_name": "SESSION_NAME_HERE"
         "admin": [ADMIN_USER_ID_HERE],
         "delim": ":"
     },

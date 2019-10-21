@@ -1,5 +1,6 @@
 # Configuration files
 src/config.json
+pyrouser.session
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
