@@ -8,7 +8,7 @@ from datetime import datetime
 
 class RSS(Document):
     time_added = DateTimeField(default=datetime.utcnow)
-    fetched = BooleanField(default=True)
+    fetched = BooleanField(required=True, default=True)
 
     rss_link = StringField(unique=True, required=True)
     link = StringField(unique=True, required=True)
