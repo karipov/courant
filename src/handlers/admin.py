@@ -3,7 +3,7 @@ Module for containing admin-related command handlers. This module makes heavy
 use of checking for admin priveleges, so a check function is included.
 """
 
-from .shared import txt, config
+from . import txt, config
 from models import User
 
 

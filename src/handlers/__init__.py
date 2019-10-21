@@ -3,12 +3,22 @@ Used to expose shared variables, object instantiations and function definitions
 """
 
 from pathlib import Path
-from telegram import TelegramError
 from enum import Enum
 import json
 
+from telegram import TelegramError
+
+from pyrogram import Client
+
+
 txt = json.load(open(Path.cwd().joinpath('src/interface/replies.json')))
 config = json.load(open(Path.cwd().joinpath('src/config.json')))
+
+client = Client(
+    session_name=config['TELEGRAM']['session_name'],
+    api_id=config['TELEGRAM']['api_id'],
+    api_hash=config['TELEGRAM']['api_hash']
+)
 
 
 class FSM(Enum):

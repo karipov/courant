@@ -9,7 +9,7 @@ Currently contains handlers for the following commands:
 - /help
 """
 
-from .shared import txt, FSM
+from . import txt, FSM
 from models import User, Settings
 import utility
 

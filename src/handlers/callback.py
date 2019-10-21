@@ -1,4 +1,4 @@
-from .shared import txt, config, remove_message
+from . import txt, config, remove_message
 from models import User
 import utility
 
@@ -120,9 +120,6 @@ def manual_explore_entry(update, context, user):
 
 def modify_rss_callback(update, context, user):
     """ Handler fsm:3.1 -> fsm:3 | fsm:3.1.1"""
-    # TODO: finish the "generation" of a modification list
-    # introduce another handler for fsm:3.1.1 that actually
-    # handles the deletion
     query = update.callback_query
     future_state = query.data.split(config['CB_DATA']['delim'])[1]
 
@@ -192,7 +189,4 @@ def delete_rss_callback(update, context, user):
     del user.subscribed.rss_list[resource_delete_id]
     user.save()
 
-    # TODO: update the message with new buttons
-    # if the user has 0 feeds, they will be only shown the back button, so
-    # no chance of an infinite loop...?
     modify_rss_callback(update, context, user)
