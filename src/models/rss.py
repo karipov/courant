@@ -35,12 +35,13 @@ class RSS(Document):
         """
         rss = cls.objects(rss_link=rss_link)
 
-        if len(rss) == 0:
-            raise LookupError(f"RSS feed with link {rss_link} not found.")
-        if len(rss) > 1:
-            raise LookupError(
-                f"More than one feed with link {rss_link} found."
-            )
+        # not needed as rss should be a unique field.
+        # if len(rss) == 0:
+        #     raise LookupError(f"RSS feed with link {rss_link} not found.")
+        # if len(rss) > 1:
+        #     raise LookupError(
+        #         f"More than one feed with link {rss_link} found."
+        #     )
 
         return rss[0]
 
