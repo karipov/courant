@@ -5,6 +5,7 @@ Used to expose shared variables, object instantiations and function definitions
 from pathlib import Path
 from enum import Enum
 import json
+import logging
 
 from telegram import TelegramError
 
@@ -19,6 +20,7 @@ client = Client(
     api_id=config['TELEGRAM']['api_id'],
     api_hash=config['TELEGRAM']['api_hash']
 )
+logging.getLogger('pyrogram').setLevel(logging.WARNING)
 
 
 class FSM(Enum):
