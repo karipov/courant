@@ -58,12 +58,20 @@
             "en": "You are already subscribed to this RSS feed."
         },
 
+        "repeated_channel": {
+            "en": "You are already subscribed to this channel."
+        },
+
         "rss_success": {
             "en": " has been added to your list of RSS feeds."
         },
 
         "deleted_rss": {
             "en": "{} has been deleted from your list of RSS feeds."
+        },
+
+        "error_channel": {
+            "en": "Your @username does not appear to be a channel. Please try again."
         }
     },
 

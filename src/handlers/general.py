@@ -8,8 +8,8 @@ Currently contains handlers for:
 Currently contains filters for:
 - text messages with certain FSM states
 """
-from .shared import txt, config, remove_message
-from models import User, RSS
+from . import txt, client, config, remove_message
+from models import User, RSS, Channel
 from scrape import rss_parse
 import utility
 
@@ -73,12 +73,12 @@ def manual_compile(update, context, user):
         )
         return
 
-    for key, link in entities.items():
+    for key, text in entities.items():
         if key.type == MessageEntity.URL:
-            rss_compile(update, context, user, link)
+            rss_compile(update, context, user, text)
             continue
-
-        # TODO: implement Telegram channels.
+        if key.type == MessageEntity.MENTION:
+            channel_compile(update, context, user, text)
 
 
 def rss_compile(update, context, user, link):
@@ -163,7 +163,8 @@ def rss_compile(update, context, user, link):
     user.subscribed.rss_list.append(db_news.pk)
     user.save()
 
-    feed_formatted = f"<a href=\"{db_news.link}\">{db_news.title}</a>"
+    feed_formatted = f"<a href=\"{db_news.link}\">" + \
+        f"{utility.escape(db_news.title)}</a>"
 
     # TODO: fix txt from CALLBACK to FSM
     # does this mean other changes such as tree checking?
@@ -195,9 +196,68 @@ def rss_compile(update, context, user, link):
     )
 
 
-def channel_compile(update, context, user):
+def channel_compile(update, context, user, text):
     """ Handler: fsm:2.1 -> ___ """
-    pass
+    language = user.settings.language
+    state = user.settings.fsm_state
+
+    with client:
+        # TODO: make sure the client doesn't get Floodwaited..
+        # If more accounts (i.e. clients) are to be used, there needs to be
+        # an efficient way to distribute the load.
+        channel = client.get_chat(text)
+
+        if channel.type != 'channel':
+            context.bot.send_message(
+                chat_id=user.user_id,
+                text=txt['CALLBACK']['error_channel'][language]
+            )
+            return
+
+        last_message_id = client.get_history(
+            chat_id=channel.id,
+            limit=1
+        )[0].message_id
+
+    try:
+        db_channel = Channel(
+            channel_id=channel.id,
+            last_entry_id=last_message_id,
+            title=channel.title,
+            description=channel.description
+        ).save()
+    except errors.NotUniqueError:
+        db_channel = Channel.get_channel(channel.id)
+
+        if user.user_id in db_channel.subscribed:
+            context.bot.send_message(
+                chat_id=user.user_id,
+                text=txt['CALLBACK']['repeated_channel'][language]
+            )
+            return
+
+    # adding the user to subscribed list in the channel document
+    db_channel.subscribed.append(user.user_id)
+    db_channel.save()
+    # adding channel to subscribed on the user document
+    user.subscribed.channel_list.append(db_channel.pk)
+    user.save()
+
+    # format the channel looks, etc.
+    channel_formatted = f"<a href=\"https://t.me/{channel.username}\">" + \
+        f"{utility.escape(channel.title)}</a>"
+
+    context.bot.send_message(
+        chat_id=user.user_id,
+        text=txt['FSM'][f'{state}b']['text'][language].format(
+            channel_formatted
+        ),
+        parse_mode='HTML',
+        reply_markup=utility.gen_keyboard(
+            txt['FSM'][f'{state}b']['markup'][language],
+            txt['FSM'][f'{state}b']['payload']
+        )
+    )
 
 
 def explore_compile(update, context, user):
