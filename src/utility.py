@@ -1,7 +1,18 @@
 """
 Helper module for various functionality
 """
+import html
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+
+def escape(text: str):
+    """
+    Escape HTML tags.
+
+    :param text: non-escaped string
+    :return: escaped string
+    """
+    return html.escape(text)
 
 
 def extract_payload(text: str, num_values=1, delim=' ') -> list:
@@ -71,38 +82,3 @@ def check_fsm(current: str, future: str, tree: dict) -> bool:
             ) for j in tree.get('children', []))
 
     return any([lookup(tree, current, future), lookup(tree, future, current)])
-
-
-# testing area:
-if __name__ == "__main__":
-    tree = {
-        "name": "1",
-        "children": [
-            {
-                "name": "2",
-                "children": [
-                    {
-                        "name": "2.1",
-                        "children": [{"name": "3"}]
-                    },
-                    {
-                        "name": "2.2",
-                        "children": [
-                            {
-                                "name": "2.2.1",
-                                "children": [{"name": "3"}]
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    }
-    current = "2.2.1"
-    future = "2.2"
-
-    print(check_fsm(
-        current=current,
-        future=future,
-        tree=tree
-    ))

@@ -13,8 +13,6 @@ from . import txt, FSM
 from models import User, Settings
 import utility
 
-import html
-
 
 markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANG_PAYLOAD'])
 
@@ -124,7 +122,7 @@ def cmd_done(update, context):
 
         data = {
             "link": f"tg://user?id={update.message.from_user.id}",
-            "name": html.escape(update.message.from_user.first_name),
+            "name": utility.escape(update.message.from_user.first_name),
             "rss_num": len(user.subscribed.rss_list),
             "channel_num": len(user.subscribed.channel_list),
             "time": user.registered.strftime("%Y-%m-%d")
