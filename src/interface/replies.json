@@ -70,6 +70,10 @@
             "en": "{} has been deleted from your list of RSS feeds."
         },
 
+        "deleted_channel": {
+            "en": "{} has been deleted from your list of channels."
+        },
+
         "error_channel": {
             "en": "Your @username does not appear to be a channel. Please try again."
         }
@@ -147,7 +151,7 @@
 
         "3": {
             "text": {
-                "en": "<i>Menu</i>\n\n<a href=\"{link}\">{name}</a> is currently subscribed to <code>{rss_num}</code> RSS feeds, <code>{channel_num}</code> Telegram Channels and using this service since <code>{time}</code>"
+                "en": "<i>Menu</i>\n\nYou are currently subscribed to <code>{rss_num}</code> RSS feeds, <code>{channel_num}</code> Telegram Channels and using this service since <code>{time}</code>"
             },
             "markup": {
                 "en": ["✎ RSS", "✎ Channels", "General Settings"]
@@ -177,9 +181,18 @@
                 "en": "<i>Modify Channels</i>\n\nHow would you like to modify your Telegram Channels?"
             },
             "markup": {
+                "en": ["« Back", "Delete"]
+            },
+            "payload": ["fin:3:back", "fin:3.2.1:delete"]
+        },
+        "3.2.1": {
+            "text": {
+                "en": "<i>Delete</i>\n\nPlease click on the Channels you'd like to unsubscribe from."
+            },
+            "markup": {
                 "en": ["« Back"]
             },
-            "payload": ["fin:3:back"]
+            "payload": ["fin:3.2:back"]
         },
         "3.3": {
             "text": {
@@ -241,7 +254,8 @@
                     "children": [{"name": "3.1.1"}]
                 },
                 {
-                    "name": "3.2"
+                    "name": "3.2",
+                    "children": [{"name": "3.2.1"}]
                 },
                 {
                     "name": "3.3",
