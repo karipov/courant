@@ -110,3 +110,17 @@ class User(Document):
         :return: total amount of users
         """
         return cls.objects.count()
+
+    def collect_main_data(self, time_format: str = '%Y-%m-%d') -> dict:
+        """
+        Returns general about user information for the main menu
+
+        :param time_format: the format for which the datetieme object is
+        converted to; for more info see official docs
+        https://docs.python.org/3/library/datetime.html#datetime.date.strftime
+        """
+        return {
+            'rss_num': len(self.subscribed.rss_list),
+            'channel_num': len(self.subscribed.channel_list),
+            'time': self.registered.strftime(time_format)
+        }
