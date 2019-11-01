@@ -1,4 +1,4 @@
-from . import txt, config, remove_message
+from . import txt, config, remove_message, to_menu
 from models import User
 import utility
 
@@ -42,8 +42,8 @@ def master_callback(update, context):
         '1': cmd_entry_type,
         '2': manual_explore_entry,
 
-        '2.1': general_callback,
-        '2.2': general_callback,
+        '2.1': to_menu,
+        '2.2': to_menu,
 
         '3': general_callback,
 
@@ -53,7 +53,7 @@ def master_callback(update, context):
         '3.2': modify_channels_callback,
         '3.2.1': delete_channel_callback,
 
-        '3.3': general_callback,
+        '3.3': to_menu,
         '3.3.1': general_callback
     }
 
@@ -116,7 +116,7 @@ def modify_rss_callback(update, context, user):
     future_state = query.data.split(config['CB_DATA']['delim'])[1]
 
     if future_state == '3':
-        general_callback(update, context, user)
+        to_menu(update, context, user)
         return
 
     # TODO: I beliebe telegram allows only a certain number of
@@ -192,7 +192,7 @@ def modify_channels_callback(update, context, user):
     future_state = query.data.split(config['CB_DATA']['delim'])[1]
 
     if future_state == '3':
-        general_callback(update, context, user)
+        to_menu(update, context, user)
         return
 
     inline = [[item.title, f'fin:3.2.1:{i}'] for i, item in enumerate(

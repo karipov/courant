@@ -151,7 +151,7 @@
 
         "3": {
             "text": {
-                "en": "<i>Menu</i>\n\nYou are currently subscribed to <code>{rss_num}</code> RSS feeds, <code>{channel_num}</code> Telegram Channels and using this service since <code>{time}</code>"
+                "en": "<i>Menu</i>\n\n<code>{rss_num:02} feeds</code>\n<code>{channel_num:02} channels</code>\n<code>{time}</code>"
             },
             "markup": {
                 "en": ["✎ RSS", "✎ Channels", "General Settings"]
