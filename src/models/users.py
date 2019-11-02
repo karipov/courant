@@ -6,6 +6,8 @@ from mongoengine import BooleanField, EmbeddedDocument, EmbeddedDocumentField
 from mongoengine import ReferenceField
 from datetime import datetime
 
+# TODO: add further constriants, e.g. max_length
+
 
 class Settings(EmbeddedDocument):
     """
@@ -13,6 +15,7 @@ class Settings(EmbeddedDocument):
     """
     language = StringField(required=True)
     fsm_state = StringField(default='0', regex="(\\d\\.)*\\d")
+    last_msg_id = IntField()
 
 
 class Subscribed(EmbeddedDocument):

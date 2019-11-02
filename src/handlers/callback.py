@@ -1,4 +1,4 @@
-from . import txt, config, remove_message, to_menu
+from . import txt, config, remove_message
 from models import User
 import utility
 
@@ -42,6 +42,7 @@ def master_callback(update, context):
         '1': cmd_entry_type,
         '2': manual_explore_entry,
 
+        # watch out, to_menu can also mean going back.. so fix the .format()?
         '2.1': to_menu,
         '2.2': to_menu,
 
@@ -60,7 +61,7 @@ def master_callback(update, context):
     fsm_options[user_state](update, context, db_user)
 
 
-def general_callback(update, context, user):
+def general_callback(update, context, user, format_data=None):
     """
     This function can be used for general callback operations. It includes
     features such as extracting the future FSM state, and setting it for the
@@ -76,9 +77,15 @@ def general_callback(update, context, user):
     user.settings.fsm_state = future_state
     user.save()
 
-    new_content = (
-        f"{txt['FSM'][future_state]['text'][user.settings.language]}"
-    )
+    if format_data:
+        new_content = (
+            f"{txt['FSM'][future_state]['text'][user.settings.language]}"
+            .format(**format_data)
+        )
+    else:
+        new_content = (
+            f"{txt['FSM'][future_state]['text'][user.settings.language]}"
+        )
 
     keyboard = utility.gen_keyboard(
         txt['FSM'][future_state]['markup'][user.settings.language],
@@ -91,6 +98,9 @@ def general_callback(update, context, user):
         reply_markup=keyboard,
         parse_mode='HTML'
     )
+
+    # if we would like to do anything with the response (save the message id)
+    return update
 
 
 def cmd_entry_type(update, context, user):
@@ -107,7 +117,19 @@ def cmd_entry_type(update, context, user):
 
 def manual_explore_entry(update, context, user):
     """ Handler 2 -> 2.1 | 2.2"""
-    general_callback(update, context, user)
+    update = general_callback(update, context, user)
+
+    # for modifying the message after the user input
+    user.settings.last_msg_id = update.callback_query.message.message_id
+    user.save()
+
+
+def to_menu(update, context, user):
+    """
+    Ensures the menu is populated with user data.
+    """
+    menu_data = user.collect_main_data()
+    general_callback(update, context, user, format_data=menu_data)
 
 
 def modify_rss_callback(update, context, user):

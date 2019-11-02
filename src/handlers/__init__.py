@@ -10,8 +10,6 @@ import logging
 from telegram import TelegramError
 from pyrogram import Client
 
-import utility
-
 
 txt = json.load(open(Path.cwd().joinpath('src/interface/replies.json')))
 config = json.load(open(Path.cwd().joinpath('src/config.json')))
@@ -31,38 +29,6 @@ class FSM(Enum):
     FINISH_MANUAL = '2.1b'
 
     DONE = '3'
-
-
-def to_menu(update, context, user):
-    """
-    Ensures the menu is populated with user data.
-    """
-    query = update.callback_query  # shorter var name
-    future_state = query.data.split(config['TELEGRAM']['delim'])[1]
-
-    # telegram requires the server to "answer" a callback query
-    context.bot.answer_callback_query(query.id)
-
-    # the "future" FSM state now becomes the "current" FSM state
-    user.settings.fsm_state = future_state
-    user.save()
-
-    new_content = (
-        f"{txt['FSM'][future_state]['text'][user.settings.language]}"
-        .format(**user.collect_main_data())
-    )
-
-    keyboard = utility.gen_keyboard(
-        txt['FSM'][future_state]['markup'][user.settings.language],
-        txt['FSM'][future_state]['payload']
-    )
-
-    # edit the message to display the selected language
-    query.edit_message_text(
-        text=new_content,
-        reply_markup=keyboard,
-        parse_mode='HTML'
-    )
 
 
 def remove_message(update, context, user):
