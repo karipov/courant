@@ -12,6 +12,8 @@ class RSS(Document):
 
     rss_link = StringField(unique=True, required=True)
     link = StringField(unique=True, required=True)
+
+    # cannot be removed
     title = StringField(required=True)
 
     subtitle = StringField(default=str)

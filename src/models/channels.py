@@ -9,6 +9,7 @@ class Channel(Document):
     fetched = BooleanField(required=True, default=True)
     channel_id = IntField(unique=True, required=True)
 
+    # cannot be removed
     title = StringField(required=True, default=str)
     description = StringField(required=True, default=str)
 

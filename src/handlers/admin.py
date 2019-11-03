@@ -33,3 +33,4 @@ def cmd_admin(update, context):
     context.bot.send_message(
         uid, txt['ADMIN']['stats']['en'].format(total_users)
     )
+    # TODO: include a button that destroys the message.

@@ -50,6 +50,7 @@ def cmd_start(update, context):
 
     # don't do anything if the user is in another FSM state
     if not current_user.settings.fsm_state == '0':
+        # TODO: fix this to use the remove_message from __init__.py
         context.bot.delete_message(uid, update.message.message_id)
         return
 
