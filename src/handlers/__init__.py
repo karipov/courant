@@ -37,6 +37,9 @@ def remove_message(update, context, user):
     function will delete the message containing that button. Also, if a user
     sends a message outside of the FSM, the message is deleted.
 
+    P.S. this function needs the user database object when editing the message
+    instead of deleting it - where it needs to know the user's language.
+
     :param user: the MongoEngine User object.
     """
     query = update.callback_query
