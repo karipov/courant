@@ -27,6 +27,12 @@ class Subscribed(EmbeddedDocument):
     rss_list = ListField(ReferenceField('RSS'), default=list)
     channel_list = ListField(ReferenceField('Channel'), default=list)
 
+    # this field is used when the user is adding channels/rss feeds.
+    # Therefore, only titles of the feeds are added, as these are later
+    # requested for a user to see what they have added.
+    # Then, the field is cleared.
+    session_list = ListField(StringField(), default=list)
+
 
 class User(Document):
     """
@@ -36,7 +42,7 @@ class User(Document):
     user_id = IntField(unique=True, required=True)
     registered = DateTimeField(default=datetime.now)
     premium = BooleanField(required=True, default=False)
-    users_invited = ListField(IntField)
+    users_invited = ListField(IntField())
     settings = EmbeddedDocumentField(Settings, required=True)
     subscribed = EmbeddedDocumentField(Subscribed)
 
