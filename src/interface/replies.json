@@ -115,9 +115,9 @@
                 "en": "<i>Manual Entry</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
             },
             "markup": {
-                "en": ["« Back"]
+                "en": ["« Back", "Done"]
             },
-            "payload": ["set:2:back"]
+            "payload": ["set:2:back", "set:3:done"]
         },
 
         "2.1b": {
@@ -208,9 +208,9 @@
                 "en": "<i>Add Feeds</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
             },
             "markup": {
-                "en": ["« Back"]
+                "en": ["« Back", "Done"]
             },
-            "payload": ["fin:3.3:back"]
+            "payload": ["fin:3.3:back", "fin:3.3:done"]
         },
         "3.3.1b": {
             "text": {
