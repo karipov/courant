@@ -54,7 +54,7 @@ def master_callback(update, context):
         '3.2': modify_channels_callback,
         '3.2.1': delete_channel_callback,
 
-        '3.3': to_menu,
+        '3.3': settings_callback,
         '3.3.1': general_callback
     }
 
@@ -130,6 +130,8 @@ def to_menu(update, context, user):
     """
     menu_data = user.collect_main_data()
     general_callback(update, context, user, format_data=menu_data)
+
+    return update
 
 
 def modify_rss_callback(update, context, user):
@@ -277,3 +279,11 @@ def delete_channel_callback(update, context, user):
     user.save()
 
     modify_channels_callback(update, context, user)
+
+
+def settings_callback(update, context, user):
+    update = to_menu(update, context, user)
+
+    # for modifying the message after the user input
+    user.settings.last_msg_id = update.callback_query.message.message_id
+    user.save()
