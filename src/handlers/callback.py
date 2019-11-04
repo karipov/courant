@@ -120,7 +120,9 @@ def manual_explore_entry(update, context, user):
     update = general_callback(update, context, user)
 
     # for modifying the message after the user input
+    # also clearing session
     user.settings.last_msg_id = update.callback_query.message.message_id
+    user.subscribed.session_list = list()
     user.save()
 
 
@@ -285,5 +287,7 @@ def settings_callback(update, context, user):
     update = to_menu(update, context, user)
 
     # for modifying the message after the user input
+    # also clearing session
     user.settings.last_msg_id = update.callback_query.message.message_id
+    user.subscribed.session_list = list()
     user.save()
