@@ -17,10 +17,7 @@ from mongoengine import errors
 from telegram.message import MessageEntity
 from telegram.error import BadRequest
 
-
-# session_list = {
-#     # user_id: [str, str, str...]
-# }
+from pyrogram.errors import BadRequest as BadRequestPyro
 
 
 def master(update, context):
@@ -76,7 +73,7 @@ def manual_compile(update, context, user):
 
     main_text = (
         txt['FSM'][state]['text'][user.settings.language]
-        + '\n\n'
+        + '\n'
     )
 
     keyboard = utility.gen_keyboard(
@@ -84,42 +81,49 @@ def manual_compile(update, context, user):
         txt['FSM'][state]['payload']
     )
 
-    if not entities:
-        remove_message(update, context, user)
-        try:
-            context.bot.edit_message_text(
-                chat_id=update.message.from_user.id,
-                message_id=edit_id,
-                text=(
-                    main_text
-                    + '\n'
-                    + txt['CALLBACK']['error'][user.settings.language]
-                ),
-                reply_markup=keyboard,
-                parse_mode='HTML'
-            )
-        except BadRequest:
-            # if message isn't modified, it's ok.
-            pass
-        return
+    # the feeds the user has already entered
+    first = True
+
+    for i, sub in enumerate(user.subscribed.session_list):
+        if first:
+            main_text += '\n'
+            first = False
+        main_text += f"{i+1}. {sub}\n"
+
+    main_text += '\n'
+
+    # TODO: add a typing status.
 
     for key, text in entities.items():
 
-        # the feeds the user has already entered
-        for i, sub in enumerate(user.subscribed.session_list):
-            main_text += f"{i}. {sub}\n"
+        if not entities:
+            main_text += txt['CALLBACK']['error'][user.settings.language]
+            break
 
         if key.type == MessageEntity.URL:
-            rss_compile(update, context, user, text,
-                        edit_id, keyboard, main_text)
+            main_text += rss_compile(update, context, user, text) + '\n'
             continue
         if key.type == MessageEntity.MENTION:
-            channel_compile(update, context, user, text,
-                            edit_id, keyboard, main_text)
+            main_text += channel_compile(update, context, user, text) + '\n'
             continue
 
+    # almost like it "absorbs" a message
+    remove_message(update, context, user)
 
-def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
+    try:
+        context.bot.edit_message_text(
+            chat_id=update.message.from_user.id,
+            message_id=edit_id,
+            text=main_text,
+            reply_markup=keyboard,
+            parse_mode='HTML',
+            disable_web_page_preview=True
+        )
+    except BadRequest:
+        pass
+
+
+def rss_compile(update, context, user, link) -> str:
     """
     Handler: fsm:2.1 -> 3
 
@@ -130,26 +134,9 @@ def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
     language = user.settings.language
     state = user.settings.fsm_state
 
-    # almost like it "absorbs" a message
-    remove_message(update, context, user)
-
     # check the source for possible errors, such as bozo and format
     if not rss_parse.check_source(news):
-        try:
-            context.bot.edit_message_text(
-                chat_id=user.user_id,
-                message_id=edit_id,
-                text=(
-                    main_text
-                    + '\n'
-                    + txt['CALLBACK']['error_link'][language]
-                ),
-                reply_markup=keyboard,
-                parse_mode='HTML'
-            )
-        except BadRequest:
-            pass
-        return
+        return txt['CALLBACK']['error_link'][language]
 
     # check the actual feed, i.e.:
     # stuff like title, subtitle, link and such.
@@ -159,21 +146,7 @@ def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
 
     # implement the checking described above
     if not checked_feed:
-        try:
-            context.bot.edit_message_text(
-                chat_id=user.user_id,
-                message_id=edit_id,
-                text=(
-                    main_text
-                    + '\n'
-                    + txt['CALLBACK']['error_feed'][language]
-                ),
-                reply_markup=keyboard,
-                parse_mode='HTML'
-            )
-        except BadRequest:
-            pass
-        return
+        return txt['CALLBACK']['error_feed'][language]
 
     # all entries must be checked for certain required elements
     # this must strike a fine balance between universality and enough
@@ -186,21 +159,7 @@ def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
 
     # implement the checking above
     if not checked_all_entries:
-        try:
-            context.bot.edit_message_text(
-                chat_id=user.user_id,
-                message_id=edit_id,
-                text=(
-                    main_text
-                    + '\n'
-                    + txt['CALLBACK']['error_entries'][language]
-                ),
-                reply_markup=keyboard,
-                parse_mode='HTML'
-            )
-        except BadRequest:
-            pass
-        return
+        return txt['CALLBACK']['error_entries'][language]
 
     # if all the checks have so far been passed, then we create the RSS
     # feed in our database and register it - unless it already exists for the
@@ -221,21 +180,7 @@ def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
         db_news = RSS.get_rss(rss_link=link)
 
         if user.user_id in db_news.subscribed:
-            try:
-                context.bot.edit_message_text(
-                    chat_id=user.user_id,
-                    message_id=edit_id,
-                    text=(
-                        main_text
-                        + '\n'
-                        + txt['CALLBACK']['repeated_rss'][language]
-                    ),
-                    reply_markup=keyboard,
-                    parse_mode='HTML'
-                )
-            except BadRequest:
-                pass
-            return
+            return txt['CALLBACK']['repeated_rss'][language]
 
         db_news.subscribed.append(user.user_id)
         db_news.fetched = True
@@ -248,24 +193,8 @@ def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
     feed_formatted = f"<a href=\"{db_news.link}\">" + \
         f"{utility.escape(db_news.title)}</a>"
 
-    # TODO: fix txt from CALLBACK to FSM
-    # does this mean other changes such as tree checking?
     if not len(news.entries) > 0:
-        try:
-            context.bot.edit_message_text(
-                chat_id=user.user_id,
-                message_id=edit_id,
-                text=(
-                    main_text
-                    + '\n'
-                    + txt['CALLBACK']['empty_feed'][language]
-                ),
-                reply_markup=keyboard,
-                parse_mode='HTML'
-            )
-        except BadRequest:
-            pass
-        return
+        return txt['CALLBACK']['empty_feed'][language]
 
     db_news.last_entry_link = news.entries[0].link
     db_news.save()
@@ -273,20 +202,10 @@ def rss_compile(update, context, user, link, edit_id, keyboard, main_text):
     # because this function is used both in the setup and post-setup, we assign
     # a special 'b' sub-state that the user never takes on, but that contains
     # the buttons required to move on to the next FSM state.
-    context.bot.edit_message_text(
-        chat_id=user.user_id,
-        message_id=edit_id,
-        text=(
-            main_text
-            + '\n'
-            + txt['FSM'][f'{state}b']['text'][language].format(feed_formatted)
-        ),
-        reply_markup=keyboard,
-        parse_mode='HTML'
-    )
+    return txt['FSM'][f'{state}b']['text'][language].format(feed_formatted)
 
 
-def channel_compile(update, context, user, text, edit_id, keyboard, main_text):
+def channel_compile(update, context, user, text,) -> str:
     """ Handler: fsm:2.1 -> ___ """
     language = user.settings.language
     state = user.settings.fsm_state
@@ -297,14 +216,13 @@ def channel_compile(update, context, user, text, edit_id, keyboard, main_text):
         # TODO: make sure the client doesn't get Floodwaited..
         # If more accounts (i.e. clients) are to be used, there needs to be
         # an efficient way to distribute the load.
-        channel = client.get_chat(text)
+        try:
+            channel = client.get_chat(text)
+        except BadRequestPyro:  # raised if username isn't occupied
+            return txt['CALLBACK']['error_channel'][language]
 
         if channel.type != 'channel':
-            context.bot.send_message(
-                chat_id=user.user_id,
-                text=txt['CALLBACK']['error_channel'][language]
-            )
-            return
+            return txt['CALLBACK']['error_channel'][language]
 
         last_message_id = client.get_history(
             chat_id=channel.id,
@@ -322,11 +240,7 @@ def channel_compile(update, context, user, text, edit_id, keyboard, main_text):
         db_channel = Channel.get_channel(channel.id)
 
         if user.user_id in db_channel.subscribed:
-            context.bot.send_message(
-                chat_id=user.user_id,
-                text=txt['CALLBACK']['repeated_channel'][language]
-            )
-            return
+            return txt['CALLBACK']['repeated_channel'][language]
 
     # adding the user to subscribed list in the channel document
     db_channel.subscribed.append(user.user_id)
@@ -340,17 +254,7 @@ def channel_compile(update, context, user, text, edit_id, keyboard, main_text):
     channel_formatted = f"<a href=\"https://t.me/{channel.username}\">" + \
         f"{utility.escape(channel.title)}</a>"
 
-    context.bot.send_message(
-        chat_id=user.user_id,
-        text=txt['FSM'][f'{state}b']['text'][language].format(
-            channel_formatted
-        ),
-        parse_mode='HTML',
-        reply_markup=utility.gen_keyboard(
-            txt['FSM'][f'{state}b']['markup'][language],
-            txt['FSM'][f'{state}b']['payload']
-        )
-    )
+    return txt['FSM'][f'{state}b']['text'][language].format(channel_formatted)
 
 
 def explore_compile(update, context, user):
