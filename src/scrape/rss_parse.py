@@ -1,11 +1,23 @@
 import feedparser
 from feedparser import FeedParserDict
 
+import requests
+import io
+
 
 def parse_url(url: str) -> FeedParserDict:
-    """ Proxy function """
-    # feedparser.registerDateHandler(omniscent_date_handler)
-    return feedparser.parse(url)
+    """
+    Proxy function
+
+    requests is used for fetching the data and feedparser used only for parsing
+    """
+    try:
+        resp = requests.get(url, timeout=(3.05, 4))
+    except (requests.ReadTimeout, requests.ConnectTimeout):
+        # just a random byte to cause a feedparser bozo
+        resp = b'0'
+
+    return feedparser.parse(io.BytesIO(resp.content))
 
 
 def check_source(parsed: FeedParserDict) -> bool:
