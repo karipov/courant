@@ -16,7 +16,6 @@ import utility
 from mongoengine import errors
 from telegram.message import MessageEntity
 from telegram.error import BadRequest
-
 from pyrogram.errors import BadRequest as BadRequestPyro
 
 
@@ -92,13 +91,12 @@ def manual_compile(update, context, user):
 
     main_text += '\n'
 
-    # TODO: add a typing status.
+    # if there are no entities, the loop below doesn't run, so no need to
+    # exit the function early.
+    if not entities:
+        main_text += txt['CALLBACK']['error'][user.settings.language]
 
     for key, text in entities.items():
-
-        if not entities:
-            main_text += txt['CALLBACK']['error'][user.settings.language]
-            break
 
         if key.type == MessageEntity.URL:
             main_text += rss_compile(update, context, user, text) + '\n'
