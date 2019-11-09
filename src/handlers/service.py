@@ -9,12 +9,11 @@ Currently contains handlers for the following commands:
 - /help
 """
 
-from . import txt, FSM
+from . import txt, remove_message, FSM
 from models import User, Settings
 import utility
 
-
-markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANG_PAYLOAD'])
+from telegram.error import BadRequest
 
 
 def get_payload(text: str):
@@ -31,51 +30,87 @@ def get_payload(text: str):
 
 
 def cmd_start(update, context):
-    """ Handler: command /start <PAYLOAD> """
     uid = update.message.from_user.id
-    # temporary language, until user selects via callback
-    lang = utility.lang(
-        update.message.from_user.language_code, txt['LANG_CODES']
-        )
     payload = get_payload(update.message.text)
-
-    # build account for a user if it doesn't exist
-    if not User.check_exists(uid=uid):
-        User(
-            user_id=uid,
-            settings=Settings(language=lang)
-        ).save()
-
-    current_user = User.get_user(uid=uid)
-
-    # don't do anything if the user is in another FSM state
-    if not current_user.settings.fsm_state == '0':
-        # TODO: fix this to use the remove_message from __init__.py
-        context.bot.delete_message(uid, update.message.message_id)
-        return
-
-    current_user.settings.fsm_state = FSM.LANGUAGE.value
-    current_user.save()
-
-    # worry about payloads and invites below:
-    if not payload:
-        context.bot.send_message(
-            uid, txt['SERVICE']['start'][lang],
-            reply_markup=markup
-            )
-        return
+    temporary_lang = utility.lang(
+        update.message.from_user.language_code, txt['LANG_CODES']
+    )
 
     try:
-        inviter = User.get_user(uid=payload)
+        user = User.get_user(uid=uid)
     except LookupError:
-        return
+        user = User(
+            user_id=uid,
+            settings=Settings(temporary_lang)
+        ).save()
 
-    inviter.add_to_invited(uid)
-    context.bot.send_message(
-        uid, txt['SERVICE']['invited_by'][lang].format(
-            context.bot.get_chat(payload).first_name
+    # "absorb" message - cleaner this way
+    remove_message(update, context, user)
+
+    main_text = ''
+    lang = user.settings.language
+
+    if user.settings.fsm_state in {'0', '1'}:
+        main_text += txt['SERVICE']['start'][lang]
+        markup = utility.gen_keyboard(txt['LANG_NAMES'], txt['LANG_PAYLOAD'])
+
+        user.settings.fsm_state = FSM.LANGUAGE.value
+        user.save()
+
+    else:
+        main_text += txt['FSM'][user.settings.fsm_state]['text'][lang]
+        markup = utility.gen_keyboard(
+            txt['FSM'][user.settings.fsm_state]['markup'][lang],
+            txt['FSM'][user.settings.fsm_state]['payload']
         )
+
+        # ensure that if user is in another state the payload isn't processed
+        # just a precaution...
+        payload = None
+
+    if user.settings.last_msg_id:
+        try:
+            context.bot.delete_message(
+                chat_id=uid,
+                message_id=user.settings.last_msg_id
+            )
+        except BadRequest:
+            try:
+                context.bot.edit_message_text(
+                    chat_id=uid,
+                    message_id=user.settings.last_msg_id,
+                    text=txt['CALLBACK']['deleted'][lang],
+                    parse_mode='HTML'
+                )
+            except BadRequest:
+                # the message can be already deleted by the user
+                pass
+
+    if payload:
+        try:
+            inviter = User.get_user(uid=payload)
+        except LookupError:
+            return
+
+        inviter.add_to_invited(uid)
+        main_text = (
+            txt['SERVICE']['invited_by'][lang].format(
+                user=utility.escape(context.bot.get_chat(payload).first_name),
+                id=inviter.user_id
+            )
+            + main_text
+        )
+
+    sent_message = context.bot.send_message(
+        chat_id=uid,
+        text=main_text,
+        reply_markup=markup,
+        parse_mode='HTML'
     )
+
+    # bot sends a new message, so the old last_msg_id must be replaced.
+    user.settings.last_msg_id = sent_message.message_id
+    user.save()
 
 
 def cmd_help(update, context):

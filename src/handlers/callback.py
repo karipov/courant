@@ -119,9 +119,7 @@ def manual_explore_entry(update, context, user):
     """ Handler 2 -> 2.1 | 2.2"""
     update = general_callback(update, context, user)
 
-    # for modifying the message after the user input
-    # also clearing session
-    user.settings.last_msg_id = update.callback_query.message.message_id
+    # clearing session
     user.subscribed.session_list = list()
     user.save()
 
@@ -286,8 +284,6 @@ def delete_channel_callback(update, context, user):
 def settings_callback(update, context, user):
     update = to_menu(update, context, user)
 
-    # for modifying the message after the user input
-    # also clearing session
-    user.settings.last_msg_id = update.callback_query.message.message_id
+    # clearing session
     user.subscribed.session_list = list()
     user.save()

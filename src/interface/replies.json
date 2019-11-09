@@ -21,7 +21,7 @@
         },
 
         "invited_by": {
-            "en": "You've been invited by user: {}"
+            "en": "You've been invited by <a href=\"tg://user?id={id}\">{user}</a>"
         }
     },
 
