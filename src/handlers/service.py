@@ -58,10 +58,15 @@ def cmd_start(update, context):
         user.save()
 
     else:
-        main_text += txt['FSM'][user.settings.fsm_state]['text'][lang]
+        # send the main menu
+        # better than sending message associated with the current state, as
+        # there are messages with customized keyboards, etc..
+        main_text += txt['FSM']['3']['text'][lang].format(
+            **user.collect_main_data()
+        )
         markup = utility.gen_keyboard(
-            txt['FSM'][user.settings.fsm_state]['markup'][lang],
-            txt['FSM'][user.settings.fsm_state]['payload']
+            txt['FSM']['3']['markup'][lang],
+            txt['FSM']['3']['payload']
         )
 
         # ensure that if user is in another state the payload isn't processed
@@ -98,6 +103,7 @@ def cmd_start(update, context):
                 user=utility.escape(context.bot.get_chat(payload).first_name),
                 id=inviter.user_id
             )
+            + '\n\n'
             + main_text
         )
 
