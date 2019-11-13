@@ -80,6 +80,20 @@ def manual_compile(update, context, user):
         txt['FSM'][state]['payload']
     )
 
+    # sometimes it takes a long time to process all the feeds.
+    # indicates that the message has been received.
+    context.bot.edit_message_text(
+        chat_id=update.message.from_user.id,
+        message_id=edit_id,
+        text=(
+            main_text  # doesn't actually modify the variable.
+            + '\n'
+            + txt['CALLBACK']['loading'][user.settings.language]
+            ),
+        reply_markup=keyboard,
+        parse_mode='HTML'
+    )
+
     # the feeds the user has already entered
     first = True
 
@@ -118,6 +132,7 @@ def manual_compile(update, context, user):
             disable_web_page_preview=True
         )
     except BadRequest:
+        # if the message contents are the same
         pass
 
 

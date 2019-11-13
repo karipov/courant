@@ -34,6 +34,10 @@
             "en": "<i>Closed.</i>"
         },
 
+        "loading": {
+            "en": "<i>Loading...</i>"
+        },
+
         "error": {
             "en": "Your message doesn't appear to be a @username or a URL. Please try again."
         },
