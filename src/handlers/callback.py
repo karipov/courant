@@ -1,4 +1,4 @@
-from . import txt, config, remove_message
+from . import txt, config
 from models import User
 import utility
 
@@ -14,28 +14,6 @@ def master_callback(update, context):
     query = update.callback_query
     db_user = User.get_user(query.from_user.id)
     user_state = db_user.settings.fsm_state
-    data_filter = query.data.split(config['CB_DATA']['delim'])
-
-    # select different trees depending on the data in the callback
-    # Why? because it's useful to separate the actions at and post
-    # the setup process for a user.
-    if data_filter[0] == config['CB_DATA']['setup']:
-        tree = txt['FSM']['TREE']
-    elif data_filter[0] == config['CB_DATA']['post_setup']:
-        tree = txt['FSM']['DONE_TREE']
-    else:
-        remove_message(update, context, db_user)
-        return
-
-    checked = utility.check_fsm(
-        current=user_state,
-        future=data_filter[1],
-        tree=tree
-        )
-
-    if not checked:
-        remove_message(update, context, db_user)
-        return
 
     # pseudo-switch/case statement
     fsm_options = {
