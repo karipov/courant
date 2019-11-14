@@ -12,12 +12,17 @@ def parse_url(url: str) -> FeedParserDict:
     requests is used for fetching the data and feedparser used only for parsing
     """
     try:
-        resp = requests.get(url, timeout=(3.05, 4))
+        resp = requests.get(url, timeout=(3.05, 4), allow_redirects=True)
     except (requests.ReadTimeout, requests.ConnectTimeout):
         # just a random byte to cause a feedparser bozo
         resp = b'0'
 
-    return feedparser.parse(io.BytesIO(resp.content))
+    try:
+        content = resp.content
+    except AttributeError:  # if response has no content attribute
+        content = b'0'
+
+    return feedparser.parse(io.BytesIO(content))
 
 
 def check_source(parsed: FeedParserDict) -> bool:
