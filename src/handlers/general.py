@@ -66,11 +66,17 @@ def manual_compile(update, context, user):
     """
     edit_id = user.settings.last_msg_id
     state = user.settings.fsm_state
-    entities = update.message.parse_entities(
-        types=['mention', 'url']
-    )
 
-    main_text = (
+    # entities limited to the first one to avoid excessive blocking by a single
+    # user, as feed fetches take a long time
+    try:
+        entity, msg = next(iter(update.message.parse_entities(
+            types=['mention', 'url']
+        ).items()))
+    except StopIteration:  # error raised if the parse_entity returns nothing
+        entity = msg = None
+
+    text = (
         txt['FSM'][state]['text'][user.settings.language]
         + '\n'
     )
@@ -80,44 +86,26 @@ def manual_compile(update, context, user):
         txt['FSM'][state]['payload']
     )
 
-    # sometimes it takes a long time to process all the feeds.
-    # indicates that the message has been received.
-    context.bot.edit_message_text(
-        chat_id=update.message.from_user.id,
-        message_id=edit_id,
-        text=(
-            main_text  # doesn't actually modify the variable.
-            + '\n'
-            + txt['CALLBACK']['loading'][user.settings.language]
-            ),
-        reply_markup=keyboard,
-        parse_mode='HTML'
-    )
-
     # the feeds the user has already entered
     first = True
 
     for i, sub in enumerate(user.subscribed.session_list):
         if first:
-            main_text += '\n'
+            text += '\n'
             first = False
-        main_text += f"{i+1}. {sub}\n"
+        text += f"{i+1}. {sub}\n"
 
-    main_text += '\n'
+    text += '\n'
 
     # if there are no entities, the loop below doesn't run, so no need to
     # exit the function early.
-    if not entities:
-        main_text += txt['CALLBACK']['error'][user.settings.language]
-
-    for key, text in entities.items():
-
-        if key.type == MessageEntity.URL:
-            main_text += rss_compile(update, context, user, text) + '\n'
-            continue
-        if key.type == MessageEntity.MENTION:
-            main_text += channel_compile(update, context, user, text) + '\n'
-            continue
+    if not all([text, entity]):
+        text += txt['CALLBACK']['error'][user.settings.language]
+    else:
+        if entity.type == MessageEntity.URL:
+            text += rss_compile(update, context, user, msg) + '\n'
+        elif entity.type == MessageEntity.MENTION:
+            text += channel_compile(update, context, user, msg) + '\n'
 
     # almost like it "absorbs" a message
     remove_message(update, context, user)
@@ -126,7 +114,7 @@ def manual_compile(update, context, user):
         context.bot.edit_message_text(
             chat_id=update.message.from_user.id,
             message_id=edit_id,
-            text=main_text,
+            text=text,
             reply_markup=keyboard,
             parse_mode='HTML',
             disable_web_page_preview=True
