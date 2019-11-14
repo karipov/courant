@@ -56,29 +56,3 @@ def lang(lang: str, allowed: list, default='en') -> str:
         return default
     else:
         return lang
-
-
-def check_fsm(current: str, future: str, tree: dict) -> bool:
-    """
-    Checks if the user is correctly following the Finite State Machine
-
-    :param current: current FSM state of the user
-    :param future: FSM that is to be set
-    :param tree: the order in which the FSM must be executed
-    :return: whether or not user is doing a legal operation
-    """
-    # it's ok for a user to remain in the same state after multiple actions
-    # such as the deletion of RSS feeds in the same menu.
-    # therefore, we allow for the below to proceed
-    if current == future:
-        return True
-
-    # recusrive function
-    def lookup(tree, a, b, flag=False):
-        if tree['name'] == b and flag:
-            return True
-        return any(lookup(
-            j, a, b, tree['name'] == a
-            ) for j in tree.get('children', []))
-
-    return any([lookup(tree, current, future), lookup(tree, future, current)])

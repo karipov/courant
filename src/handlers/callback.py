@@ -1,4 +1,4 @@
-from . import txt, config
+from . import txt, config, remove_message
 from models import User
 import utility
 
@@ -14,6 +14,11 @@ def master_callback(update, context):
     query = update.callback_query
     db_user = User.get_user(query.from_user.id)
     user_state = db_user.settings.fsm_state
+
+    # if user click button of a message that is not the most current one
+    # shouldn't happen, but who knows...
+    if context.message.message_id != db_user.settings.last_msg_id:
+        remove_message(update, context, db_user)
 
     # pseudo-switch/case statement
     fsm_options = {

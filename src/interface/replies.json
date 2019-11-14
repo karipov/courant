@@ -104,6 +104,7 @@
             "markup": [],
             "payload": []
         },
+
         "2": {
             "text": {
                 "en": "<i>Language set to English</i>\n\nNow, choose how you'd like to set up your news:"
@@ -143,6 +144,7 @@
             },
             "payload": ["set:2:back"]
         },
+
         "2.2.1": {
             "text": {
                 "en": "Loading..."
@@ -151,7 +153,6 @@
                 "en": "Suggestions for channels and RSS feeds to follow have been compiled. Select which ones you'd like to follow by clicking the buttons below:"
             }
         },
-
 
         "3": {
             "text": {
@@ -162,6 +163,7 @@
             },
             "payload": ["fin:3.1:rss", "fin:3.2:channels", "fin:3.3:general"]
         },
+
         "3.1": {
             "text": {
                 "en": "<i>Modify RSS</i>\n\nHow would you like to modify your RSS feeds?"
@@ -171,6 +173,7 @@
             },
             "payload": ["fin:3:back", "fin:3.1.1:delete"]
         },
+
         "3.1.1": {
             "text": {
                 "en": "<i>Delete</i>\n\nPlease click on the RSS Feeds you'd like to unsubscribe from."
@@ -180,6 +183,7 @@
             },
             "payload": ["fin:3.1:back"]
         },
+
         "3.2": {
             "text": {
                 "en": "<i>Modify Channels</i>\n\nHow would you like to modify your Telegram Channels?"
@@ -189,6 +193,7 @@
             },
             "payload": ["fin:3:back", "fin:3.2.1:delete"]
         },
+
         "3.2.1": {
             "text": {
                 "en": "<i>Delete</i>\n\nPlease click on the Channels you'd like to unsubscribe from."
@@ -198,6 +203,7 @@
             },
             "payload": ["fin:3.2:back"]
         },
+
         "3.3": {
             "text": {
                 "en": "<i>General Settings</i>\n\nHow would you like to modify all of your feeds?"
@@ -207,6 +213,7 @@
             },
             "payload": ["fin:3.3.1:add_feeds","fin:3:back"]
         },
+
         "3.3.1": {
             "text": {
                 "en": "<i>Add Feeds</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
@@ -216,6 +223,7 @@
             },
             "payload": ["fin:3.3:back", "fin:3.3:done"]
         },
+
         "3.3.1b": {
             "text": {
                 "en": "{} successfully added to your list of feeds."
@@ -224,48 +232,6 @@
                 "en": ["Done"]
             },
             "payload": ["fin:3.3:done"]
-            },
-
-        "TREE": {
-            "name": "1",
-            "children": [
-                {
-                    "name": "2",
-                    "children": [
-                        {
-                            "name": "2.1",
-                            "children": [{"name": "3"}]
-                        },
-                        {
-                            "name": "2.2",
-                            "children": [
-                                {
-                                    "name": "2.2.1",
-                                    "children": [{"name": "3"}]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-
-        "DONE_TREE": {
-            "name": "3",
-            "children": [
-                {
-                    "name": "3.1",
-                    "children": [{"name": "3.1.1"}]
-                },
-                {
-                    "name": "3.2",
-                    "children": [{"name": "3.2.1"}]
-                },
-                {
-                    "name": "3.3",
-                    "children": [{"name": "3.3.1"}]
-                }
-            ]
         }
     }
 }
