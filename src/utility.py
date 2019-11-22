@@ -1,8 +1,63 @@
 """
-Helper module for various functionality
+Helper module for various functionality. If gets too large will be turned
+into a folder. For now - manageable.
 """
 import html
+import requests
+import io
+
+import feedparser
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+
+def parse_url(url: str, timeout=(3.05, 4)) -> feedparser.FeedParserDict:
+    """
+    Proxy function
+
+    requests is used for fetching the data and feedparser used only for parsing
+    """
+    try:
+        resp = requests.get(url, timeout=timeout)
+    except (requests.ReadTimeout, requests.ConnectTimeout):
+        # just a random byte to cause a feedparser bozo
+        resp = b'0'
+    except requests.exceptions.MissingSchema:
+        resp = requests.get(f'http://{url}', timeout=timeout)
+
+    try:
+        content = resp.content
+    except AttributeError:  # if response has no content attribute
+        content = b'0'
+
+    return feedparser.parse(io.BytesIO(content))
+
+
+def check_source(parsed: feedparser.FeedParserDict) -> bool:
+    """
+    Checks the parsed feed for encoding et bozo
+
+    :param parsed: potentially invalid RSS feed
+    :return: whether the RSS feed is actually valid or not
+    """
+    if parsed.bozo == 1:
+        return False
+    if not parsed.get('encoding'):
+        return False
+    if not parsed.encoding.upper() == 'utf-8'.upper():
+        return False
+
+    return True
+
+
+def check_parsed(parsed: feedparser.FeedParserDict, req_keys: list) -> bool:
+    """
+    Checks either the feed or entry of a parsed RSS feed
+
+    :param parsed: valid, utf-8 feedparsed RSS
+    :req_keys: keys that the `parsed` must contain
+    :return: whether the parsed has the needed elements
+    """
+    return all([parsed.get(x) is not None for x in req_keys])
 
 
 def escape(text: str):
