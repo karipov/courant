@@ -12,13 +12,13 @@ def master_callback(update, context):
     thanks PTB. very cool.
     """
     query = update.callback_query
-    db_user = User.get_user(query.from_user.id)
-    user_state = db_user.settings.fsm_state
+    user = User.get_user(query.from_user.id)
+    user_state = user.settings.fsm_state
 
     # if user click button of a message that is not the most current one
     # shouldn't happen, but who knows...
-    if context.message.message_id != db_user.settings.last_msg_id:
-        remove_message(update, context, db_user)
+    if update.callback_query.message.message_id != user.settings.last_msg_id:
+        remove_message(update, context, user)
 
     # pseudo-switch/case statement
     fsm_options = {
@@ -41,7 +41,7 @@ def master_callback(update, context):
         '3.3.1': general_callback
     }
 
-    fsm_options[user_state](update, context, db_user)
+    fsm_options[user_state](update, context, user)
 
 
 def general_callback(update, context, user, format_data=None):
