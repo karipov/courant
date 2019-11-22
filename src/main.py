@@ -2,14 +2,17 @@ from pathlib import Path
 from json import load
 import logging
 
-from handlers import admin, service, callback, general
 from telegram.ext import Updater, CommandHandler, CallbackQueryHandler
 from telegram.ext import MessageHandler
 from telegram.ext.filters import Filters
 
+from handlers import admin, service, callback, general
+from handlers import client
+from scrape import Scraper
+
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG
+    level=logging.INFO
     )
 
 # set some config files and define them as objects
@@ -42,6 +45,9 @@ dispatcher.add_handler(CallbackQueryHandler(callback.master_callback))
 
 # add error handler
 # dispatcher.add_error_handler(error)
+
+scrape = Scraper(config=args, bot=updater.bot, client=client)
+scrape.run()
 
 # start polling
 updater.start_polling()

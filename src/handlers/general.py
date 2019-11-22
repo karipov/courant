@@ -8,15 +8,14 @@ Currently contains handlers for:
 Currently contains filters for:
 - text messages with certain FSM states
 """
-from . import txt, client, config, remove_message
-from models import User, RSS, Channel
-from scrape import rss_parse
-import utility
-
 from mongoengine import errors
 from telegram.message import MessageEntity
 from telegram.error import BadRequest
 from pyrogram.errors import BadRequest as BadRequestPyro
+
+from . import txt, client, config, remove_message
+from models import User, RSS, Channel
+import utility
 
 
 def master(update, context):
@@ -131,17 +130,17 @@ def rss_compile(update, context, user, link) -> str:
     :param user: mongoengine User object
     :param link: the extracted entity from the message
     """
-    news = rss_parse.parse_url(link)
+    news = utility.parse_url(link)
     language = user.settings.language
     state = user.settings.fsm_state
 
     # check the source for possible errors, such as bozo and format
-    if not rss_parse.check_source(news):
+    if not utility.check_source(news):
         return txt['CALLBACK']['error_link'][language]
 
     # check the actual feed, i.e.:
     # stuff like title, subtitle, link and such.
-    checked_feed = rss_parse.check_parsed(
+    checked_feed = utility.check_parsed(
         news.feed, config['SCRAPE']['RSS']['req_feed_keys']
     )
 
@@ -153,7 +152,7 @@ def rss_compile(update, context, user, link) -> str:
     # this must strike a fine balance between universality and enough
     # information for a good display of the RSS feed
     checked_all_entries = all([
-        rss_parse.check_parsed(
+        utility.check_parsed(
             x, config['SCRAPE']['RSS']['req_entry_keys']
             ) for x in news.entries
         ])
@@ -206,7 +205,7 @@ def rss_compile(update, context, user, link) -> str:
     return txt['FSM'][f'{state}b']['text'][language].format(feed_formatted)
 
 
-def channel_compile(update, context, user, text,) -> str:
+def channel_compile(update, context, user, text) -> str:
     """ Handler: fsm:2.1 -> ___ """
     language = user.settings.language
     state = user.settings.fsm_state
