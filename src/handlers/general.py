@@ -232,6 +232,7 @@ def channel_compile(update, context, user, text) -> str:
     try:
         db_channel = Channel(
             channel_id=channel.id,
+            username=text,
             last_entry_id=last_message_id,
             title=channel.title,
             description=channel.description

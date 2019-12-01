@@ -8,6 +8,8 @@ class Channel(Document):
     time_added = DateTimeField(default=datetime.datetime.utcnow)
     fetched = BooleanField(required=True, default=True)
     channel_id = IntField(unique=True, required=True)
+    username = StringField(required=True)
+    # TODO: need a username field.
 
     # cannot be removed
     title = StringField(required=True, default=str)
@@ -27,7 +29,7 @@ class Channel(Document):
         Retrieve a single channel given its id.
 
         :param id: the channel_id to retrieve for
-        :return: Channel database objeect
+        :return: Channel database object
         """
         assert type(id) == int
         return cls.objects(channel_id=id)[0]
