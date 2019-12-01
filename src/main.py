@@ -7,7 +7,6 @@ from telegram.ext import MessageHandler
 from telegram.ext.filters import Filters
 
 from handlers import admin, service, callback, general
-from handlers import client
 from scrape import Scraper
 
 logging.basicConfig(
@@ -46,7 +45,7 @@ dispatcher.add_handler(CallbackQueryHandler(callback.master_callback))
 # add error handler
 # dispatcher.add_error_handler(error)
 
-scrape = Scraper(config=args, bot=updater.bot, client=client)
+scrape = Scraper(config=args, bot=updater.bot)
 scrape.run()
 
 # start polling

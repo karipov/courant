@@ -2,8 +2,9 @@
 """
 from pathlib import Path
 from threading import Thread
-import logging
 import time
+
+from pyrogram import Client
 
 from models import Channel
 
@@ -11,15 +12,19 @@ from models import Channel
 class Scraper:
     # import functions from other modules
 
-    def __init__(self, config: dict, bot, client):
+    def __init__(self, config: dict, bot):
         """
         :param config: dict object containing config data.
         :param bot: python-telegram-bot object
         """
-        self.session_path = Path.cwd().joinpath(
-            'src/client/sessions/pyrouser.session'
+        self.client = Client(
+            session_name=config['PYROGRAM']['update_session_file'],
+            workdir=Path.cwd().joinpath(
+                config['PYROGRAM']['sessions_path']
+                ),
+            api_id=config['PYROGRAM']['api_id'],
+            api_hash=config['PYROGRAM']['api_hash']
         )
-        self.client = client
         self.bot = bot
 
         # must not forget to stop the client.
@@ -29,13 +34,12 @@ class Scraper:
         """
         Function to launch & run loop in a separate thread with updates.
         """
-        def loop_run():
+        def _loop_run():
             while True:
-                logging.info("heyy?")
                 self.update_channels()
                 time.sleep(10)  # avoid floods
 
-        Thread(target=loop_run).start()
+        Thread(target=_loop_run).start()
 
     def update_channels(self):
         """
@@ -46,7 +50,6 @@ class Scraper:
             posts = self.get_new_posts(resource)
 
             for user_id in resource.subscribed:
-
                 for post in posts:
                     self.send_post(post.text.html, user_id)
 
@@ -66,7 +69,7 @@ class Scraper:
         """
         # ensure the channel is resolved
         # TODO: this might need to be improved due to flood limits.
-        _ = self.client.get_chat(channel.channel_id)
+        _ = self.client.get_chat(channel.username)
 
         last_message_id = self.client.get_history(
             chat_id=channel.channel_id,
@@ -74,7 +77,6 @@ class Scraper:
         )[0].message_id
 
         if last_message_id == channel.last_entry_id:
-            # no new posts
             return []
 
         posts = []
@@ -86,6 +88,10 @@ class Scraper:
                 break
 
             posts.append(message)
+
+        # the list needs to be reversed as posts go from new to old, and
+        # users need to be served chronologically.
+        posts.reverse()
 
         # update the last_message_id as new data has been fetched.
         channel.last_entry_id = last_message_id

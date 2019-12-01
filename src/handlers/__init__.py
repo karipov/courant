@@ -10,16 +10,18 @@ import logging
 from telegram import TelegramError
 from pyrogram import Client
 
-
+logging.getLogger('pyrogram').setLevel(logging.WARNING)
 txt = json.load(open(Path.cwd().joinpath('src/interface/replies.json')))
 config = json.load(open(Path.cwd().joinpath('src/config.json')))
 
 client = Client(
-    session_name=config['TELEGRAM']['session_name'],
-    api_id=config['TELEGRAM']['api_id'],
-    api_hash=config['TELEGRAM']['api_hash']
+    session_name=config['PYROGRAM']['fetch_session_file'],
+    workdir=Path.cwd().joinpath(
+        config['PYROGRAM']['sessions_path']
+    ),
+    api_id=config['PYROGRAM']['api_id'],
+    api_hash=config['PYROGRAM']['api_hash']
 )
-logging.getLogger('pyrogram').setLevel(logging.WARNING)
 
 
 class FSM(Enum):
