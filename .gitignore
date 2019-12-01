@@ -1,6 +1,9 @@
 # Configuration files
 src/config.json
-pyrouser.session
+
+# Session files:
+src/client/sessions/*
+!src/client/sessions/README.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
