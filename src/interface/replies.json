@@ -83,6 +83,12 @@
         }
     },
 
+    "UPD_CHANS": {
+        "deleted": {
+            "en": "<i>Warning</i>\n\n{} has either been deleted or changed usernames. It's now removed from your list of feeds."
+        }
+    },
+
     "ADMIN": {
         "stats": {
             "en": "here you go you creep:\n- total users: {0}"

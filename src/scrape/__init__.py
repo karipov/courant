@@ -3,10 +3,12 @@
 from pathlib import Path
 from threading import Thread
 import time
+import json
 
 from pyrogram import Client
+from pyrogram.errors import BadRequest
 
-from models import Channel
+from models import Channel, User
 
 
 class Scraper:
@@ -26,6 +28,9 @@ class Scraper:
             api_hash=config['PYROGRAM']['api_hash']
         )
         self.bot = bot
+        self.txt = json.load(
+            open(Path.cwd().joinpath('src/interface/replies.json'))
+        )
 
         # must not forget to stop the client.
         self.client.start()
@@ -47,7 +52,23 @@ class Scraper:
         subscribed user and new post and sends the users the new info.
         """
         for resource in Channel.objects:
-            posts = self.get_new_posts(resource)
+
+            try:
+                posts = self.get_new_posts(resource)
+            except BadRequest:  # if username doesn't exist; invalid,
+                for user_id in resource.subscribed:
+                    user = User.get_user(user_id)
+                    user_lang = user.settings.language
+
+                    self.send_post(
+                        self.txt['UPD_CHANS']['deleted'][user_lang].format(
+                            resource.username
+                        ),
+                        user_id
+                    )
+
+                resource.delete()
+                return
 
             for user_id in resource.subscribed:
                 for post in posts:
