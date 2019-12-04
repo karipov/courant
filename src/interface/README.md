@@ -17,12 +17,12 @@ responses separated by different iso language codes:
 ```json
 "num.num.num" : {
     "text": {
-        "lang_code_iso": text in lang,
-        "another_lang_code_iso": text in another lang
+        "lang_code_iso": "text in lang",
+        "another_lang_code_iso": "text in another lang"
     },
     "markup": {
-        "lang_code_iso": markup in lang,
-        "another_lang_code_iso": markup in another lang
+        "lang_code_iso": ["markup in lang"],
+        "another_lang_code_iso": ["markup in another lang"]
     }
 }
 ```
