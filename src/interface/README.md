@@ -7,39 +7,29 @@ mainly concerns the [`replies.json`](replies.json) file at the moment.
 The top-level keys (in caps), divide the responses of the bot across many
 handlers, or "**sections**". Further down the tree, within each section, you may
 find responses to certain commands, or error responses. These are themselves
-dictionaries - and their contents are the **appropriate responses for different
-languages**.
+dictionaries - and their contents are the **appropriate responses for different languages**.
 
-The FSM section, however, is more special, as it contains not just response
-text, but **also keyboard and callback data** information. The callback data
-is divided in a logical way, that must be respected throughout the document,
-which is:
-
-```
-<type of callback data; default 'fsm'> : <future state> : <additional info>
-```
-
-Additionally, it also contains a **hierarchal tree structure** of it's states
-and how they are related to each other. It's parsed using the
-[anytree](https://github.com/c0fec0de/anytree) library, and looks something
-like this:
+One also may notice the special FSM top-level key, within which are seen the
+FSM states themselves, indicated as numbers separated by dots. Within those, 
+you will find the `text` and `markup` key which contains a dictionary of 
+responses separated by different iso language codes:
 
 ```json
-"TREE": {
-    "name": "1",
-    "children": [
-        {
-            "name": "2",
-            "children": [
-                {
-                    "name": "2.1",
-                    "children": [
-...
+"num.num.num" : {
+    "text": {
+        "lang_code_iso": text in lang,
+        "another_lang_code_iso": text in another lang
+    },
+    "markup": {
+        "lang_code_iso": markup in lang,
+        "another_lang_code_iso": markup in another lang
+    }
+}
 ```
 
-The tree structure is used in the `check_fsm(...)` function found in
-[`utility.py`](../utility.py).
-
+Additionally, it also contains another key: `payload`. This key must not be
+touched or modified for the purposes of translation, as it's only useful for
+controlling the logic of the bot.
 
 ## For Translators
 You must **ignore** (as in *don't touch*):
@@ -48,7 +38,6 @@ You must **ignore** (as in *don't touch*):
 `<i>`, `</i>` and others; however, make sure they **stay intact** as you are
 translating
 - `FSM/[state]/payload` key and its value(s)
-- `FSM/TREE` key and its value(s)
 
 Furthermore, if you've noticed that your language code does not appear with an
 empty key in all of the responses, i.e. if it doesn't look like below:
