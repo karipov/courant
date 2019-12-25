@@ -1,0 +1,1 @@
+rsync -avP --filter=':- .rsyncignore' .. ubuntu@scale:/home/ubuntu
