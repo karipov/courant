@@ -4,8 +4,9 @@ from pathlib import Path
 from threading import Thread
 import time
 import json
+import html
 
-from pyrogram import Client
+from pyrogram import Client, Message
 from pyrogram.errors import BadRequest
 
 from models import Channel, User
@@ -55,7 +56,7 @@ class Scraper:
 
             try:
                 posts = self.get_new_posts(resource)
-            except BadRequest:  # if username doesn't exist; invalid,
+            except BadRequest:  # if username doesn't exist; invalid.
                 for user_id in resource.subscribed:
                     user = User.get_user(user_id)
                     user_lang = user.settings.language
@@ -72,14 +73,56 @@ class Scraper:
 
             for user_id in resource.subscribed:
                 for post in posts:
-                    self.send_post(post.text.html, user_id)
+                    data = self.filter_post(post)
+                    self.send_post(data, user_id)
 
-    def send_post(self, post: str, user_id: int):
-        self.bot.send_message(
-            chat_id=user_id,
-            text=post,
-            parse_mode='HTML'
-        )
+    def filter_post(self, post: Message) -> dict:
+        """
+        Filters the pyrogram Message class to be sent by PTB
+
+        :param post: pyrogram Message
+        :return dict: dictionary with all info about type:
+        """
+        info = {
+            'metadata': {}
+        }
+
+        if post.media:
+            info['method'] = self.bot.send_message
+
+            info['metadata']['text'] = (
+                f"<b>{html.escape(post.chat.title)}</b> "
+                f"<a href=\"t.me/"
+                f"{post.chat.username}/{post.message_id}\">[»]</a>"
+            )
+            info['metadata']['disable_web_page_preview'] = False
+            info['metadata']['parse_mode'] = 'HTML'
+
+            return info
+
+        if post.text:
+            # when the channel title is added, total message length can be
+            # more than 4096 chars, so it's shortened.
+            cut_and_html = \
+                post.text.html[:4096-len(post.chat.title)-10] + ' ...'
+
+            info['method'] = self.bot.send_message
+
+            info['metadata']['text'] = (
+                f"<b>{html.escape(post.chat.title)}</b> "
+                f"<a href=\"t.me/"
+                f"{post.chat.username}/{post.message_id}\">[»]</a>\n"
+                f"{cut_and_html}"
+            )
+            info['metadata']['parse_mode'] = 'HTML'
+            info['metadata']['disable_web_page_preview'] = True
+
+            return info
+
+    def send_post(self, info: dict, user_id: int):
+        info['metadata']['chat_id'] = user_id
+        # execute function with provided metadata
+        info['method'](**info['metadata'])
 
     def get_new_posts(self, channel: Channel) -> list:
         """
@@ -105,7 +148,7 @@ class Scraper:
         # prevents from users flooding the bot, so we just grab at most last
         # 15 messages from the channel.
         for message in self.client.iter_history(channel.channel_id, limit=15):
-            if message.message_id == channel.last_entry_id:
+            if message.message_id <= channel.last_entry_id:
                 break
 
             posts.append(message)
