@@ -24,11 +24,12 @@ def update_channels(self):
                 user = User.get_user(user_id)
                 user_lang = user.settings.language
 
-                self.send_post(
-                    self.txt['UPD_CHANS']['deleted'][user_lang].format(
+                self.bot.send_message(
+                    text=self.txt['UPD_CHANS']['deleted'][user_lang].format(
                         resource.username
                     ),
-                    user_id
+                    chat_id=user_id,
+                    parse_mode='HTML'
                 )
 
             resource.delete()
