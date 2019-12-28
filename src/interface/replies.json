@@ -89,6 +89,12 @@
         }
     },
 
+    "UPD_RSS": {
+        "bad_feed": {
+            "en": "<i>Warning</i>\n\nThere has been an error with RSS feed <a href=\"{}\">{}</a>. It's now removed from your list of feeds."
+        }
+    },
+
     "ADMIN": {
         "stats": {
             "en": "here you go you creep:\n- total users: {0}"
