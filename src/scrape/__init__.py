@@ -10,8 +10,6 @@ from pyrogram import Client
 
 
 class Scraper:
-    # import functions from other modules
-
     def __init__(self, config: dict, bot):
         """
         :param config: dict object containing config data.
@@ -34,6 +32,7 @@ class Scraper:
         # must not forget to stop the client.
         self.client.start()
 
+    # import functions from other modules
     from ._channel_scrape import update_channels, _get_new_posts, \
         _filter_post, _send_post
     from ._rss_scrape import update_rss_feeds, _full_feed_check, \
@@ -41,7 +40,7 @@ class Scraper:
 
     def run(self):
         """
-        Function to launch & run loop in a separate thread with updates.
+        Launch & run loop in a separate thread with updates.
         """
         def _loop_run():
             while True:
