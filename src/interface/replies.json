@@ -84,12 +84,16 @@
     },
 
     "UPD_CHANS": {
+        "formatted": "<b>{}</b> <a href=\"t.me/{}/{}\">[»]</a>",
+
         "deleted": {
             "en": "<i>Warning</i>\n\n{} has either been deleted or changed usernames. It's now removed from your list of feeds."
         }
     },
 
     "UPD_RSS": {
+        "formatted": "<b>{}</b> <a href=\"{}\">[»]</a>",
+
         "bad_feed": {
             "en": "<i>Warning</i>\n\nThere has been an error with RSS feed <a href=\"{}\">{}</a>. It's now removed from your list of feeds."
         }

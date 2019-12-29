@@ -52,13 +52,15 @@ def _filter_post(self, post: Message) -> dict:
         'metadata': {}
     }
 
+    # all posts that contain media are sent as links to channels. This way a
+    # preview is generated for these itens without having to worry about
+    # download/upload or obtaining file_ids with relevant access_hash'es.
     if post.media:
         info['method'] = self.bot.send_message
 
-        info['metadata']['text'] = (
-            f"<b>{html.escape(post.chat.title)}</b> "
-            f"<a href=\"t.me/"
-            f"{post.chat.username}/{post.message_id}\">[»]</a>"
+        info['metadata']['text'] = self.txt['UPD_CHANS']['formatted'].format(
+            html.escape(post.chat.title), post.chat.username,
+            post.message_id
         )
         info['metadata']['disable_web_page_preview'] = False
         info['metadata']['parse_mode'] = 'HTML'
@@ -73,12 +75,10 @@ def _filter_post(self, post: Message) -> dict:
 
         info['method'] = self.bot.send_message
 
-        info['metadata']['text'] = (
-            f"<b>{html.escape(post.chat.title)}</b> "
-            f"<a href=\"t.me/"
-            f"{post.chat.username}/{post.message_id}\">[»]</a>\n"
-            f"{cut_and_html}"
-        )
+        info['metadata']['text'] = self.txt['UPD_CHANS']['formatted'].format(
+            html.escape(post.chat.title), post.chat.username,
+            post.message_id
+        ) + cut_and_html  # add the actual text to the formatted link-title
         info['metadata']['parse_mode'] = 'HTML'
         info['metadata']['disable_web_page_preview'] = True
 
@@ -86,6 +86,12 @@ def _filter_post(self, post: Message) -> dict:
 
 
 def _send_post(self, info: dict, user_id: int):
+    """
+    Send PTB posts using a filtered pyrogram message
+
+    :param info: function type & associated metadata
+    :param user_id: chat_id for message to be sent to
+    """
     info['metadata']['chat_id'] = user_id
     # execute function with provided metadata
     info['method'](**info['metadata'])

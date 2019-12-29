@@ -16,6 +16,8 @@ def update_rss_feeds(self):
     for feed in RSS.objects:
         parsed = utility.parse_url(feed.rss_link)
 
+        # even though a feed check is done when the it is added to the
+        # database, xml files can change any time
         if not self._full_feed_check(parsed):
             for user_id in feed.subscribed:
                 user = User.get_user(user_id)
@@ -40,9 +42,8 @@ def update_rss_feeds(self):
         for user_id in feed.subscribed:
             for entry in new_entries:
                 self.bot.send_message(
-                    text=(
-                        f"<b>{html.escape(entry.title)}</b> "
-                        f"<a href=\"{entry.link}\">[»]</a>"
+                    text=self.txt['UPD_RSS']['formatted'].format(
+                        html.escape(entry.title), entry.link
                     ),
                     chat_id=user_id,
                     parse_mode='HTML'
@@ -84,7 +85,8 @@ def _get_new_entries(self, db_feed: RSS, rss_parsed) -> list:
     Grabs new entries from an RSS feed
 
     :param db_feed: MongoEngine RSS feed object
-    :parm rss_parsed: parsed & checked RSS feed
+    :param rss_parsed: parsed & checked RSS feed
+    :return: list of new entries
     """
     if len(rss_parsed.entries) == 0:
         return []
