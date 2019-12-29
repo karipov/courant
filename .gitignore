@@ -1,5 +1,6 @@
 # Configuration files
 src/config.json
+example.txt
 
 # Session files:
 src/client/sessions/*
