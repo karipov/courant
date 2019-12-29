@@ -18,7 +18,7 @@ def update_channels(self):
     for resource in Channel.objects:
 
         try:
-            posts = self.get_new_posts(resource)
+            posts = self._get_new_posts(resource)
         except BadRequest:  # if username doesn't exist; invalid.
             for user_id in resource.subscribed:
                 user = User.get_user(user_id)
@@ -37,11 +37,11 @@ def update_channels(self):
 
         for user_id in resource.subscribed:
             for post in posts:
-                data = self.filter_post(post)
-                self.send_post(data, user_id)
+                data = self._filter_post(post)
+                self._send_post(data, user_id)
 
 
-def filter_post(self, post: Message) -> dict:
+def _filter_post(self, post: Message) -> dict:
     """
     Filters the pyrogram Message class to be sent by PTB
 
@@ -85,13 +85,13 @@ def filter_post(self, post: Message) -> dict:
         return info
 
 
-def send_post(self, info: dict, user_id: int):
+def _send_post(self, info: dict, user_id: int):
     info['metadata']['chat_id'] = user_id
     # execute function with provided metadata
     info['method'](**info['metadata'])
 
 
-def get_new_posts(self, channel: Channel) -> list:
+def _get_new_posts(self, channel: Channel) -> list:
     """
     Grabs all the new posts from a channel
 
