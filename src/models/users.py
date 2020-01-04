@@ -47,7 +47,6 @@ class User(Document):
     subscribed = EmbeddedDocumentField(Subscribed)
 
     meta = {
-        'indexes': ['user_id'],
         'collection': 'users'
     }
 
