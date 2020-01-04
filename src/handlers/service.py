@@ -41,7 +41,9 @@ def cmd_start(update, context):
     except LookupError:
         user = User(
             user_id=uid,
-            settings=Settings(temporary_lang)
+            settings=Settings(
+                language=temporary_lang
+            )
         ).save()
 
     # "absorb" message - cleaner this way
