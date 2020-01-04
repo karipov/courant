@@ -1,9 +1,16 @@
 from __future__ import annotations
+from datetime import datetime
 
 from mongoengine import Document
 from mongoengine import StringField, IntField, ListField, DateTimeField
 from mongoengine import BooleanField
-from datetime import datetime
+import pycld2
+
+# must be suported by MongoDB
+LANGUAGES = [
+    'en', 'da', 'nl', 'fi', 'fr', 'de', 'hu', 'it',
+    'ro', 'ru', 'es', 'sv', 'tr', 'nb', 'pt'
+]
 
 
 class RSS(Document):
@@ -15,17 +22,51 @@ class RSS(Document):
 
     # cannot be removed
     title = StringField(required=True)
-
     subtitle = StringField(default=str)
     summary = StringField(default=str)
+    language = StringField(default=str)
+
     last_entry_link = StringField(required=True, default=str)
 
     subscribed = ListField(IntField(), default=list)
 
     meta = {
         'collection': 'rss',
-        'indexes': ['$title']
+        'indexes': [{
+            'fields': ['$title', '$subtitle', '$summary'],
+            'default_language': 'none',
+            'weights': {'title': 10, 'subtitle': 3, 'summary': 3}
+        }]
     }
+
+    def clean(self):
+        """
+        Override
+        """
+        total_strings = self.title \
+            + ' ' + self.subtitle \
+            + ' ' + self.summary
+
+        _, _, details = pycld2.detect(
+            total_strings, isPlainText=True, bestEffort=True
+        )
+
+        lang_codes = [x[1] for x in details]
+        selected = [x for x in lang_codes if x in LANGUAGES]
+
+        try:
+            self.language = selected[0]
+        except IndexError:
+            self.language = 'none'
+
+    def check_subscription(self, uid: int) -> bool:
+        """
+        Checks whether an RSS feed has a given user in its subscription
+
+        :param uid: telegram-given user_id
+        :return: whether or not the the user is subscribed
+        """
+        return uid in self.subscribed
 
     @classmethod
     def get_rss(cls, rss_link: str) -> RSS:
@@ -46,12 +87,3 @@ class RSS(Document):
         #     )
 
         return rss[0]
-
-    def check_subscription(self, uid: int) -> bool:
-        """
-        Checks whether an RSS feed has a given user in its subscription
-
-        :param uid: telegram-given user_id
-        :return: whether or not the the user is subscribed
-        """
-        return uid in self.subscribed
