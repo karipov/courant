@@ -1,24 +1,25 @@
 import datetime
 
-from mongoengine import Document
+from mongoengine import Document, EmbeddedDocument
 from mongoengine import IntField, ListField, DateTimeField, BooleanField
-from mongoengine import StringField
-import pycld2
+from mongoengine import StringField, EmbeddedDocumentField
 
-LANGUAGES = [
-    'en', 'da', 'nl', 'fi', 'fr', 'de', 'hu', 'it',
-    'ro', 'ru', 'es', 'sv', 'tr', 'nb', 'pt'
-]
+import utility
+
+
+class MetaInfoChannel(EmbeddedDocument):
+    time_added = DateTimeField(default=datetime.datetime.utcnow)
+    fetched = BooleanField(required=True, default=True)
 
 
 class Channel(Document):
-    time_added = DateTimeField(default=datetime.datetime.utcnow)
-    fetched = BooleanField(required=True, default=True)
+    meta_info = EmbeddedDocumentField(MetaInfoChannel, default=MetaInfoChannel)
     channel_id = IntField(unique=True, required=True)
     username = StringField(required=True)
 
     # cannot be removed
     title = StringField(required=True, default=str)
+    title_ngrams = ListField(StringField(), default=list)
     description = StringField(required=True, default=str)
     language = StringField(default=str)
 
@@ -28,9 +29,9 @@ class Channel(Document):
 
     meta = {
         'indexes': [{
-            'fields': ['$title', '$description'],
+            'fields': ['$title', '$description', '$title_ngrams'],
             'default_language': 'none',
-            'weights': {'title': 10, 'description': 3}
+            'weights': {'title': 10, 'description': 3, 'title_ngrams': 3}
         }],
         'collection': 'channels'
     }
@@ -39,19 +40,11 @@ class Channel(Document):
         """
         Override
         """
-        total_strings = self.title + ' ' + self.description
+        self.title_ngrams = utility.gen_ngrams(self.title)
 
-        _, _, details = pycld2.detect(
-            total_strings, isPlainText=True, bestEffort=True
+        self.language = utility.detect_language(
+            [self.title, self.description]
         )
-
-        lang_codes = [x[1] for x in details]
-        selected = [x for x in lang_codes if x in LANGUAGES]
-
-        try:
-            self.language = selected[0]
-        except IndexError:
-            self.language = 'none'
 
     @classmethod
     def get_channel(cls, id: int):

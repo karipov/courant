@@ -1,27 +1,26 @@
 from __future__ import annotations
 from datetime import datetime
 
-from mongoengine import Document
+from mongoengine import Document, EmbeddedDocument
 from mongoengine import StringField, IntField, ListField, DateTimeField
-from mongoengine import BooleanField
-import pycld2
+from mongoengine import BooleanField, EmbeddedDocumentField
 
-# must be suported by MongoDB
-LANGUAGES = [
-    'en', 'da', 'nl', 'fi', 'fr', 'de', 'hu', 'it',
-    'ro', 'ru', 'es', 'sv', 'tr', 'nb', 'pt'
-]
+import utility
 
 
-class RSS(Document):
+class MetaInfoRSS(EmbeddedDocument):
     time_added = DateTimeField(default=datetime.utcnow)
     fetched = BooleanField(required=True, default=True)
 
+
+class RSS(Document):
+    meta_info = EmbeddedDocumentField(MetaInfoRSS, default=MetaInfoRSS)
     rss_link = StringField(unique=True, required=True)
     link = StringField(unique=True, required=True)
 
     # cannot be removed
     title = StringField(required=True)
+    title_ngrams = ListField(StringField(), default=list)
     subtitle = StringField(default=str)
     summary = StringField(default=str)
     language = StringField(default=str)
@@ -31,33 +30,28 @@ class RSS(Document):
     subscribed = ListField(IntField(), default=list)
 
     meta = {
-        'collection': 'rss',
         'indexes': [{
-            'fields': ['$title', '$subtitle', '$summary'],
+            'fields': ['$title', '$subtitle', '$summary', '$title_ngrams'],
             'default_language': 'none',
-            'weights': {'title': 10, 'subtitle': 3, 'summary': 3}
-        }]
+            'weights': {
+                'title': 10,
+                'title_ngrams': 3,
+                'subtitle': 3,
+                'summary': 3
+            }
+        }],
+        'collection': 'rss'
     }
 
     def clean(self):
         """
         Override
         """
-        total_strings = self.title \
-            + ' ' + self.subtitle \
-            + ' ' + self.summary
-
-        _, _, details = pycld2.detect(
-            total_strings, isPlainText=True, bestEffort=True
+        # RSS titles tend to be longer, so min_size higher
+        self.title_ngrams = utility.gen_ngrams(self.title, min_size=4)
+        self.language = utility.detect_language(
+            [self.title, self.subtitle, self.summary]
         )
-
-        lang_codes = [x[1] for x in details]
-        selected = [x for x in lang_codes if x in LANGUAGES]
-
-        try:
-            self.language = selected[0]
-        except IndexError:
-            self.language = 'none'
 
     def check_subscription(self, uid: int) -> bool:
         """
