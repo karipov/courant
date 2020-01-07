@@ -44,20 +44,20 @@ class User(Document):
     premium = BooleanField(required=True, default=False)
     users_invited = ListField(IntField())
     settings = EmbeddedDocumentField(Settings, required=True)
-    subscribed = EmbeddedDocumentField(Subscribed)
+    subscribed = EmbeddedDocumentField(Subscribed, default=Subscribed)
 
     meta = {
         'collection': 'users'
     }
 
-    def clean(self):
-        """
-        Overrides the clean method that is activated as the document is saved.
-        This method currently creates an empty 'Subscribed' EmbeddedDocument
-        as the User object is being created.
-        """
-        if not self.subscribed:
-            self.subscribed = Subscribed()
+    # def clean(self):
+    #     """
+    #     Overrides the clean method that is activated as the document is saved
+    #     This method currently creates an empty 'Subscribed' EmbeddedDocument
+    #     as the User object is being created.
+    #     """
+    #     if not self.subscribed:
+    #         self.subscribed = Subscribed()
 
     def add_to_invited(self, payload: int):
         """
