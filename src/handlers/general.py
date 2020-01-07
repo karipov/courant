@@ -183,7 +183,7 @@ def rss_compile(update, context, user, link) -> str:
             return txt['CALLBACK']['repeated_rss'][language]
 
         db_news.subscribed.append(user.user_id)
-        db_news.fetched = True
+        db_news.meta_info.fetched = True
         db_news.save()
 
     user.subscribed.rss_list.append(db_news.pk)
@@ -245,6 +245,7 @@ def channel_compile(update, context, user, text) -> str:
 
     # adding the user to subscribed list in the channel document
     db_channel.subscribed.append(user.user_id)
+    db_channel.meta_info.fetched = True
     db_channel.save()
     # adding channel to subscribed on the user document
     user.subscribed.channel_list.append(db_channel.pk)
@@ -259,4 +260,61 @@ def channel_compile(update, context, user, text) -> str:
 
 
 def explore_compile(update, context, user):
+    """
+    Handler: fsm:2.2 -> 3
+    """
+    language = user.settings.language
+    state = user.settings.fsm_state
+
+    text = txt['FSM'][state][language] + '\n'
+    keyboard = utility.gen_keyboard(
+        txt['FSM'][state]['markup'][language],
+        txt['FSM'][state]['payload']
+    )
+
+    search_terms = update.message.rstrip().split(config['TELEGRAM']['delim'])
+
+    remove_message(update, user, context)
+
+    sources = []
+    for search in search_terms:
+        found_rss = RSS.objects.search_text(search)
+        found_chans = Channel.objects.search_text(search)
+
+        sources.extend(found_rss).extend(found_chans)
+
+    if len(sources) == 0:
+        text += '\n' + txt['CALLBACK']['error_no_results'][language]
+    else:
+        text += '\n'
+        for source in sources:
+            text += '\n' + source.title
+
+    try:
+        context.bot.edit_message_text(
+            chat_id=update.message.from_user.id,
+            message_id=user.settings.last_msg_id,
+            text=text,
+            reply_markup=keyboard,
+            parse_mode='HTML',
+            disable_web_page_preview=True
+        )
+    except BadRequest:
+        pass
+
+
+def search_sources(user, terms: list, max_results: int = 10) -> list:
+    """
+    Searches RSS and Channels databases and returns results
+
+    :param user: user database object to compare queries against already
+    subscribed users
+    :param terms: list of search terms
+    :param max_results: maximum number of return results
+    """
+    # all_found = []
+
+    # for term in terms:
+    #     found_rss = RSS.objects.search_text(term)
+    #     found_channel
     pass
