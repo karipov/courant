@@ -5,9 +5,11 @@ into a folder. For now - manageable.
 import html
 import requests
 import io
+import random
 
 import feedparser
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+import pycld2
 
 
 def parse_url(url: str, timeout=(3.05, 4)) -> feedparser.FeedParserDict:
@@ -111,3 +113,55 @@ def lang(lang: str, allowed: list, default='en') -> str:
         return default
     else:
         return lang
+
+
+def gen_ngrams(text: str, min_size: int = 2, max_len: int = 120) -> list:
+    """
+    Generates and assigns a list of n-grams for a given text
+
+    :param text: text to be n-gramed
+    :param min_size: minimum character length for each 'gram'
+    :param max_len: maximum number of n-gram's
+    """
+    length = len(text)
+    size_range = range(min_size, max(length, min_size) + 1)
+
+    n_grams = list(set(
+        text[i:i + size].strip()  # remove whitspace
+        for size in size_range
+        for i in range(0, max(0, length - size) + 1)
+    ))
+
+    # cannot allow the list to be too large, so random deletion.
+    # TODO: better way to handle this?
+    if len(n_grams) > max_len:
+        to_delete = set(random.sample(
+            range(len(n_grams)), abs(max_len - len(n_grams))
+        ))
+        n_grams = [x for i, x in enumerate(n_grams) if i not in to_delete]
+
+    return n_grams
+
+
+def detect_language(all_strings: list) -> str:
+    """
+    :param all_strings: list of strings to detect langs from.
+    """
+    LANGUAGES = [
+        'en', 'da', 'nl', 'fi', 'fr', 'de', 'hu', 'it',
+        'ro', 'ru', 'es', 'sv', 'tr', 'nb', 'pt'
+    ]
+
+    total = ' '.join(all_strings)
+
+    _, _, details = pycld2.detect(
+        total, isPlainText=True, bestEffort=True
+    )
+
+    lang_codes = [x[1] for x in details]
+    selected = [x for x in lang_codes if x in LANGUAGES]
+
+    try:
+        return selected[0]
+    except IndexError:
+        return 'none'
