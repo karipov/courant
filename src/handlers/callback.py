@@ -51,7 +51,7 @@ def general_callback(update, context, user, format_data=None):
     user.
     """
     query = update.callback_query  # shorter var name
-    future_state = query.data.split(config['TELEGRAM']['delim'])[1]
+    future_state = query.data.split(config['CB_DATA']['delim'])[1]
 
     # telegram requires the server to "answer" a callback query
     context.bot.answer_callback_query(query.id)
@@ -90,7 +90,7 @@ def cmd_entry_type(update, context, user):
     """ Handler: 1 -> 2 """
     # custom handler needed to ensure language set-up
     query = update.callback_query
-    chosen_language_code = query.data.split(config['TELEGRAM']['delim'])[2]
+    chosen_language_code = query.data.split(config['CB_DATA']['delim'])[2]
 
     user.settings.language = chosen_language_code
     user.save()
@@ -169,7 +169,7 @@ def delete_rss_callback(update, context, user):
 
     # if the RSS feed has only one subscribed, then we disable fetching feed
     if len(rss_resource.subscribed) == 1:
-        rss_resource.fetched = False
+        rss_resource.meta_info.fetched = False
         rss_resource.subscribed = []
     else:
         rss_resource.subscribed.remove(user.user_id)
@@ -242,7 +242,7 @@ def delete_channel_callback(update, context, user):
 
     # if the RSS feed has only one subscribed, then we disable fetching feed
     if len(channel_resource.subscribed) == 1:
-        channel_resource.fetched = False
+        channel_resource.meta_info.fetched = False
         channel_resource.subscribed = []
     else:
         channel_resource.subscribed.remove(user.user_id)
