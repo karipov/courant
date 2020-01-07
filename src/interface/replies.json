@@ -80,6 +80,10 @@
 
         "error_channel": {
             "en": "Your @username does not appear to be a channel. Please try again."
+        },
+
+        "error_no_results": {
+            "en": "No results have been found for terms: <b>\"{}\"</b>."
         }
     },
 
@@ -161,11 +165,8 @@
             "payload": ["set:2:back"]
         },
 
-        "2.2.1": {
+        "2.2b": {
             "text": {
-                "en": "Loading..."
-            },
-            "text2": {
                 "en": "Suggestions for channels and RSS feeds to follow have been compiled. Select which ones you'd like to follow by clicking the buttons below:"
             }
         },
