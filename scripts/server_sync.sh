@@ -1,1 +1,1 @@
-rsync -avP --filter=':- .rsyncignore' .. ubuntu@scale:/home/ubuntu
+rsync -avP --exclude-from .rsyncignore . ubuntu@scale:/home/ubuntu/courant/
