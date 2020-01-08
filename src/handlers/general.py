@@ -314,6 +314,8 @@ def search_sources(user, terms: list, max_results: int = 10) -> list:
         return []
 
     all_found = []
+    # mongodb search by a space works in a way that almost does separate
+    # searches for each term.
     all_found.extend(RSS.objects.search_text(' '.join(terms)))
     all_found.extend(Channel.objects.search_text(' '.join(terms)))
 
