@@ -70,15 +70,18 @@ def _filter_post(self, post: Message) -> dict:
     if post.text:
         # when the channel title is added, total message length can be
         # more than 4096 chars, so it's shortened.
-        cut_and_html = \
-            post.text.html[:4096-len(post.chat.title)-10] + ' ...'
+        if len(post.text.html) >= 4096:
+            cut_and_html = \
+                post.text.html[:4096-len(post.chat.title)-10] + ' ...'
+        else:
+            cut_and_html = post.text.html
 
         info['method'] = self.bot.send_message
 
         info['metadata']['text'] = self.txt['UPD_CHANS']['formatted'].format(
             html.escape(post.chat.title), post.chat.username,
             post.message_id
-        ) + cut_and_html  # add the actual text to the formatted link-title
+        ) + '\n' + cut_and_html  # add the actual text to the  link-title
         info['metadata']['parse_mode'] = 'HTML'
         info['metadata']['disable_web_page_preview'] = True
 
