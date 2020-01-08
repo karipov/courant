@@ -1,11 +1,16 @@
 {
     "TELEGRAM": {
-        "token": "API_TOKEN_HERE",
-        "api_id": API_ID_HERE,
-        "api_hash": "API_HASH_HERE",
-        "session_name": "SESSION_NAME_HERE"
-        "admin": [ADMIN_USER_ID_HERE],
-        "delim": ":"
+        "token": "TOKEN HERE",
+        "admin": [ADMIN_ID1, ADMIN_ID2..],
+        "delim": ","
+    },
+
+    "PYROGRAM": {
+        "api_id": API ID HERE,
+        "api_hash": "API HASH HERE",
+        "fetch_session_file": "fetch",
+        "update_session_file": "update",
+        "sessions_path": "src/client/sessions/"
     },
 
     "CB_DATA": {
@@ -17,7 +22,7 @@
 
     "MONGO": {
         "name": "courant",
-        "dev_mode": true
+        "dev_mode": false
     },
 
     "SCRAPE": {
