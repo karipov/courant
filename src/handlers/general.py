@@ -8,6 +8,7 @@ Currently contains handlers for:
 Currently contains filters for:
 - text messages with certain FSM states
 """
+import html
 from mongoengine import errors
 from telegram.message import MessageEntity
 from telegram.error import BadRequest
@@ -266,27 +267,24 @@ def explore_compile(update, context, user):
     language = user.settings.language
     state = user.settings.fsm_state
 
-    text = txt['FSM'][state][language] + '\n'
+    text = txt['FSM'][state]['text'][language] + '\n'
     keyboard = utility.gen_keyboard(
         txt['FSM'][state]['markup'][language],
         txt['FSM'][state]['payload']
     )
 
-    search_terms = update.message.rstrip().split(config['TELEGRAM']['delim'])
+    remove_message(update, context, user)
 
-    remove_message(update, user, context)
-
-    sources = []
-    for search in search_terms:
-        found_rss = RSS.objects.search_text(search)
-        found_chans = Channel.objects.search_text(search)
-
-        sources.extend(found_rss).extend(found_chans)
+    search_terms = update.message.text.strip().split(
+        config['TELEGRAM']['delim']
+    )
+    sources = search_sources(user, search_terms)
 
     if len(sources) == 0:
-        text += '\n' + txt['CALLBACK']['error_no_results'][language]
+        text += '\n' + txt['CALLBACK']['error_no_results'][language].format(
+            html.escape(update.message.text)
+        )
     else:
-        text += '\n'
         for source in sources:
             text += '\n' + source.title
 
@@ -312,9 +310,21 @@ def search_sources(user, terms: list, max_results: int = 10) -> list:
     :param terms: list of search terms
     :param max_results: maximum number of return results
     """
-    # all_found = []
+    if len(terms) == 0:
+        return []
 
-    # for term in terms:
-    #     found_rss = RSS.objects.search_text(term)
-    #     found_channel
-    pass
+    all_found = []
+    all_found.extend(RSS.objects.search_text(' '.join(terms)))
+    all_found.extend(Channel.objects.search_text(' '.join(terms)))
+
+    # remove anything users are already subscribed to
+    new_found = [x for x in all_found if (
+        x.id not in user.subscribed.rss_list
+        and x.id not in user.subscribed.channel_list
+        )
+    ]
+
+    # sort top results by text score so a cut-off can be made
+    return list(sorted(
+        new_found, key=lambda x: x.get_text_score(), reverse=True
+    ))[:max_results]
