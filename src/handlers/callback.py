@@ -1,3 +1,5 @@
+from telegram.error import BadRequest
+
 from . import txt, config, remove_message
 from models import User
 import utility
@@ -76,11 +78,14 @@ def general_callback(update, context, user, format_data=None):
     )
 
     # edit the message to display the selected language
-    query.edit_message_text(
-        text=new_content,
-        reply_markup=keyboard,
-        parse_mode='HTML'
-    )
+    try:
+        query.edit_message_text(
+            text=new_content,
+            reply_markup=keyboard,
+            parse_mode='HTML'
+        )
+    except BadRequest:
+        pass
 
     # if we would like to do anything with the response (save the message id)
     return update
@@ -241,7 +246,7 @@ def delete_channel_callback(update, context, user):
     channel_resource = user.subscribed.channel_list[resource_delete_id]
 
     # if the RSS feed has only one subscribed, then we disable fetching feed
-    if len(channel_resource.subscribed) == 1:
+    if len(channel_resource.subscribed) <= 1:
         channel_resource.meta_info.fetched = False
         channel_resource.subscribed = []
     else:

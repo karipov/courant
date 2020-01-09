@@ -5,6 +5,7 @@ information from channels to users
 import html
 
 from pyrogram.errors import BadRequest
+from telegram.error import Unauthorized
 from pyrogram import Message
 
 from models import Channel, User
@@ -96,8 +97,12 @@ def _send_post(self, info: dict, user_id: int):
     :param user_id: chat_id for message to be sent to
     """
     info['metadata']['chat_id'] = user_id
+
     # execute function with provided metadata
-    info['method'](**info['metadata'])
+    try:
+        info['method'](**info['metadata'])
+    except Unauthorized:  # if user blocked bot
+        User.get_user(user_id).delete()
 
 
 def _get_new_posts(self, channel: Channel) -> list:
