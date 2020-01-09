@@ -160,9 +160,9 @@
                 "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>"
             },
             "markup": {
-                "en": ["« Back"]
+                "en": ["« Back", "Done"]
             },
-            "payload": ["set:2:back"]
+            "payload": ["set:2:back", "set:3:done"]
         },
 
         "2.2b": {
