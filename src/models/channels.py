@@ -56,3 +56,7 @@ class Channel(Document):
         """
         assert type(id) == int
         return cls.objects(channel_id=id)[0]
+
+    @property
+    def link(self):
+        return f'https://t.me/{self.username}'

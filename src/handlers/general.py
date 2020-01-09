@@ -254,7 +254,7 @@ def channel_compile(update, context, user, text) -> str:
     user.save()
 
     # format the channel looks, etc.
-    channel_formatted = f"<a href=\"https://t.me/{channel.username}\">" + \
+    channel_formatted = f"<a href=\"{channel.link}\">" + \
         f"{utility.escape(channel.title)}</a>"
 
     return txt['FSM'][f'{state}b']['text'][language].format(channel_formatted)
