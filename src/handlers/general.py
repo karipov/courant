@@ -14,8 +14,8 @@ from telegram.message import MessageEntity
 from telegram.error import BadRequest
 from pyrogram.errors import BadRequest as BadRequestPyro
 
-from . import txt, client, config, remove_message
-from models import User, RSS, Channel
+from . import txt, client, config, remove_message, create_new_user
+from models import RSS, Channel
 import utility
 
 
@@ -24,7 +24,7 @@ def master(update, context):
     This handler is implemented to generally deal with FSM states in incoming
     messages.
     """
-    db_user = User.get_user(update.message.from_user.id)
+    db_user = create_new_user(update)
     user_state = db_user.settings.fsm_state
 
     # the reason why a list such as this is used instead of a tree, such as the

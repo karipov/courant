@@ -9,8 +9,8 @@ Currently contains handlers for the following commands:
 - /help
 """
 
-from . import txt, remove_message, FSM
-from models import User, Settings
+from . import txt, remove_message, create_new_user, FSM
+from models import User
 import utility
 
 from telegram.error import BadRequest
@@ -32,19 +32,7 @@ def get_payload(text: str):
 def cmd_start(update, context):
     uid = update.message.from_user.id
     payload = get_payload(update.message.text)
-    temporary_lang = utility.lang(
-        update.message.from_user.language_code, txt['LANG_CODES']
-    )
-
-    try:
-        user = User.get_user(uid=uid)
-    except LookupError:
-        user = User(
-            user_id=uid,
-            settings=Settings(
-                language=temporary_lang
-            )
-        ).save()
+    user = create_new_user(update)
 
     # "absorb" message - cleaner this way
     remove_message(update, context, user)

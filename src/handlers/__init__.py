@@ -10,6 +10,10 @@ import logging
 from telegram import TelegramError
 from pyrogram import Client
 
+from models import User, Settings
+import utility
+
+
 logging.getLogger('pyrogram').setLevel(logging.WARNING)
 txt = json.load(open(Path.cwd().joinpath('src/interface/replies.json')))
 config = json.load(open(Path.cwd().joinpath('src/config.json')))
@@ -72,3 +76,24 @@ def remove_message(update, context, user):
             text=txt['CALLBACK']['deleted'][user.settings.language],
             parse_mode='HTML'
         )
+
+
+def create_new_user(update) -> User:
+    """
+    :param update: PTB update
+    :return: new or fetched user
+    """
+    try:
+        return User.get_user(uid=update.message.from_user.id)
+    except LookupError:
+        user = User(
+            user_id=update.message.from_user.id,
+            settings=Settings(
+                language=utility.lang(
+                    update.message.from_user.language_code, txt['LANG_CODES']
+                )
+            )
+        )
+
+        user.save()
+        return user
