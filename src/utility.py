@@ -3,13 +3,13 @@ Helper module for various functionality. If gets too large will be turned
 into a folder. For now - manageable.
 """
 import html
-import requests
 import io
 import random
 
 import feedparser
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import pycld2
+import requests
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
 def parse_url(url: str, timeout=(3.05, 4)) -> feedparser.FeedParserDict:
@@ -20,7 +20,8 @@ def parse_url(url: str, timeout=(3.05, 4)) -> feedparser.FeedParserDict:
     """
     try:
         resp = requests.get(url, timeout=timeout)
-    except (requests.ReadTimeout, requests.ConnectTimeout):
+    except (requests.ReadTimeout, requests.ConnectTimeout,
+            requests.ConnectionError):
         # just a random byte to cause a feedparser bozo
         resp = b'0'
     except requests.exceptions.MissingSchema:
