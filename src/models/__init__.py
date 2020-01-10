@@ -1,5 +1,6 @@
 from json import load
 from pathlib import Path
+import os
 
 from mongoengine import connect
 
@@ -16,4 +17,5 @@ db = connect(args['MONGO']['name'])
 
 # clears database before start of every test.
 if args['MONGO']['dev_mode']:
-    db.drop_database(args['MONGO']['name'])
+    if not os.getenv('TELEGRAM_PRODUCTION', False):
+        db.drop_database(args['MONGO']['name'])

@@ -17,8 +17,8 @@ from scrape import Scraper
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.DEBUG
-    )
+    level=logging.INFO
+)
 
 # set some config files and define them as objects
 args = load(open(Path.cwd().joinpath('src/config.json')))
@@ -41,7 +41,7 @@ def error(update, context):
     """
 
     if update.effective_message:
-        text = "Hey. I'm sorry to inform you that an error happened." \
+        text = "Hey. I'm sorry to inform you that an error happened " \
                "while I tried to handle your update. " \
                "My developer(s) will be notified."
         try:
