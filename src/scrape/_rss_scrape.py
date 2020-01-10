@@ -4,6 +4,8 @@ information from rss feeds to users
 """
 import html
 
+from telegram.error import Unauthorized
+
 from models import RSS, User
 import utility
 
@@ -41,13 +43,34 @@ def update_rss_feeds(self):
 
         for user_id in feed.subscribed:
             for entry in new_entries:
-                self.bot.send_message(
-                    text=self.txt['UPD_RSS']['formatted'].format(
+                exists = self._send_rss_message(
+                    self.txt['UPD_RSS']['formatted'].format(
                         html.escape(entry.title), entry.link
-                    ),
-                    chat_id=user_id,
-                    parse_mode='HTML'
-                )
+                    ), user_id)
+
+                if not exists:
+                    if user_id in feed.subscribed:
+                        feed.subscribed.remove(user_id)
+                    feed.save()
+                    break
+
+
+def _send_rss_message(self, text, chat_id) -> bool:
+    """
+    Send message and check for user exists...
+    """
+    try:
+        self.bot.send_message(
+            text, chat_id, parse_mode='HTML'
+        )
+    except Unauthorized:
+        try:
+            User.get_user(chat_id).delete()
+            return False
+        except LookupError:
+            return False
+
+    return True
 
 
 def _full_feed_check(self, rss_parsed) -> bool:

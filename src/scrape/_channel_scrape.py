@@ -39,7 +39,13 @@ def update_channels(self):
         for user_id in resource.subscribed:
             for post in posts:
                 data = self._filter_post(post)
-                self._send_post(data, user_id)
+                exists = self._send_post(data, user_id)
+
+                if not exists:
+                    if user_id in resource.subscribed:
+                        resource.subscribed.remove(user_id)
+                    resource.save()
+                    break
 
 
 def _filter_post(self, post: Message) -> dict:
@@ -89,12 +95,13 @@ def _filter_post(self, post: Message) -> dict:
         return info
 
 
-def _send_post(self, info: dict, user_id: int):
+def _send_post(self, info: dict, user_id: int) -> bool:
     """
     Send PTB posts using a filtered pyrogram message
 
     :param info: function type & associated metadata
     :param user_id: chat_id for message to be sent to
+    :return: bool to indicate if user still exists
     """
     info['metadata']['chat_id'] = user_id
 
@@ -102,7 +109,13 @@ def _send_post(self, info: dict, user_id: int):
     try:
         info['method'](**info['metadata'])
     except Unauthorized:  # if user blocked bot
-        User.get_user(user_id).delete()
+        try:
+            User.get_user(user_id).delete()
+            return False
+        except LookupError:
+            return False
+
+    return True
 
 
 def _get_new_posts(self, channel: Channel) -> list:
