@@ -1,89 +1,109 @@
 {
-    "LANG_CODES": ["en"],
-    "LANG_PAYLOAD": ["set:2:en"],
-    "LANG_NAMES": ["English"],
+    "LANG_CODES": ["en", "ru"],
+    "LANG_PAYLOAD": ["set:2:en", "set:2:ru"],
+    "LANG_NAMES": ["English", "Русский"],
 
     "SERVICE": {
         "start": {
-            "en": "Hello there! Please select your language:"
+            "en": "Hello there! Please select your language:",
+            "ru": "Здравствуйте! Пожалуйста выберете язык:"
         },
 
         "help": {
-            "en": "Contact @tgcode for more info."
+            "en": "Contact @tgcode for more info.",
+            "ru": "При наличии вопросов, пишите @tgcode."
         },
 
         "cancel": {
-            "en": "Action cancelled. Please send /start to configure the bot again."
+            "en": "Action cancelled. Please send /start to configure the bot again.",
+            "ru": "Отменено. Отправьте /start чтобы начать заново."
         },
 
         "done": {
-            "en": "Your options have been registered."
+            "en": "Your options have been registered.",
+            "ru": "Ваш выбор сохранен."
         },
 
         "invited_by": {
-            "en": "You've been invited by <a href=\"tg://user?id={id}\">{user}</a>"
+            "en": "You've been invited by <a href=\"tg://user?id={id}\">{user}</a>",
+            "ru": "Вы были приглашены <a href=\"tg://user?id={id}\">{user}</a>"
         }
     },
 
     "CALLBACK": {
         "restart": {
-            "en": "Please restart your bot with /start."
+            "en": "Please restart your bot with /start.",
+            "ru": "Пожалуйста перезапустите бота с командой /start."
         },
 
         "deleted": {
-            "en": "<i>Closed.</i>"
+            "en": "<i>Closed.</i>",
+            "ru": "<i>Удалено.</i>"
         },
 
         "loading": {
-            "en": "<i>Loading...</i>"
+            "en": "<i>Loading...</i>",
+            "ru": "<i>Загрузка...</i>"
         },
 
         "error": {
-            "en": "Your message doesn't appear to be a @username or a URL. Please try again."
+            "en": "Your message doesn't appear to be a @username or a URL. Please try again.",
+            "ru": "Ваше сообщение не является телеграм каналом или ссылкой. Попробуйте ещё раз."
         },
 
         "error_link": {
-            "en": "This does not appear to be a valid link. Please try again."
+            "en": "This does not appear to be a valid link. Please try again.",
+            "ru": "Предоставленная ссылка недействительна. Попробуйте ещё раз."
         },
 
         "error_feed": {
-            "en": "The RSS feed appears to be missing elements, or is malformed."
+            "en": "The RSS feed appears to be missing elements, or is malformed.",
+            "ru": "В ленте RSS отсутствуют нужные элементы и она плохо сформирована."
         },
 
         "error_entries": {
-            "en": "The articles in the RSS feed appear to be missing elements or are malformed."
+            "en": "The articles in the RSS feed appear to be missing elements or are malformed.",
+            "ru": "У статьей в ленте RSS отсутствуют нужные элементы и они плохо сформированы."
         },
 
         "empty_feed": {
-            "en": " is empty, but has nonetheless been added to your list of RSS feeds."
+            "en": " is empty, but has nonetheless been added to your list of RSS feeds.",
+            "ru": " на данные момент пуст, но все же был добавлен в ваш список RSS лент."
         },
 
         "repeated_rss": {
-            "en": "You are already subscribed to this RSS feed."
+            "en": "You are already subscribed to this RSS feed.",
+            "ru": "Вы уже подписаны к этой RSS ленте."
         },
 
         "repeated_channel": {
-            "en": "You are already subscribed to this channel."
+            "en": "You are already subscribed to this channel.",
+            "ru": "Вы уже подписаны к этому телеграм каналу."
         },
 
         "rss_success": {
-            "en": " has been added to your list of RSS feeds."
+            "en": " has been added to your list of RSS feeds.",
+            "ru": " был добавлен к вашему списку RSS лент."
         },
 
         "deleted_rss": {
-            "en": "{} has been deleted from your list of RSS feeds."
+            "en": "{} has been deleted from your list of RSS feeds.",
+            "ru": "{} была удалена со списка ваших RSS лент."
         },
 
         "deleted_channel": {
-            "en": "{} has been deleted from your list of channels."
+            "en": "{} has been deleted from your list of channels.",
+            "ru": "{} был удалён со списка ваших каналов."
         },
 
         "error_channel": {
-            "en": "Your @username does not appear to be a channel. Please try again."
+            "en": "Your @username does not appear to be a channel. Please try again.",
+            "ru": "Ваш юзернейм не является каналом. Попробуйте ещё раз."
         },
 
         "error_no_results": {
-            "en": "No results have been found for terms: <b>\"{}\"</b>."
+            "en": "No results have been found for terms: <b>\"{}\"</b>.",
+            "ru": "По вашему запросу <b>\"{}\"</b> ничего не нашлось."
         }
     },
 
@@ -91,7 +111,8 @@
         "formatted": "<b>{}</b> <a href=\"t.me/{}/{}\">[»]</a>",
 
         "deleted": {
-            "en": "<i>Warning</i>\n\n{} has either been deleted or changed usernames. It's now removed from your list of feeds."
+            "en": "<i>Warning</i>\n\n{} has either been deleted or changed usernames. It's now removed from your list of feeds.",
+            "ru": "<i>Важно</i>\n\n{} был удалён или поменял юзернейм. Удаление со списка ваших каналов."
         }
     },
 
@@ -99,19 +120,22 @@
         "formatted": "<b>{}</b> <a href=\"{}\">[»]</a>",
 
         "bad_feed": {
-            "en": "<i>Warning</i>\n\nThere has been an error with RSS feed <a href=\"{}\">{}</a>. It's now removed from your list of feeds."
+            "en": "<i>Warning</i>\n\nThere has been an error with RSS feed <a href=\"{}\">{}</a>. It's now removed from your list of feeds.",
+            "ru": "<i>Важно</i>\n\nПроизошла ошибка с RSS лентой <a href=\"{}\">{}</a>. Удаление сo списка ваших лент."
         }
     },
 
     "ADMIN": {
         "stats": {
-            "en": "here you go you creep:\n- total users: {0}"
+            "en": "here you go you creep:\n- total users: {0}",
+            "ru": "here you go you creep:\n- total users: {0}"
         }
     },
 
     "GENERAL": {
         "set_up": {
-            "en": "You're all set up!"
+            "en": "You're all set up!",
+            "ru": "Все настроено!"
         }
     },
 
@@ -119,7 +143,8 @@
     "FSM": {
         "1": {
             "text": {
-                "en": "Hello there! Please select your preffered language:"
+                "en": "Hello there! Please select your preffered language:",
+                "ru": "Здравствуйте! Пожалуйста выберете язык:"
             },
             "markup": [],
             "payload": []
@@ -127,126 +152,151 @@
 
         "2": {
             "text": {
-                "en": "<i>Language set to English</i>\n\nNow, choose how you'd like to set up your news:"
+                "en": "<i>Language set to English</i>\n\nNow, choose how you'd like to set up your news:",
+                "ru": "<i>Русский язык</i>\n\nТеперь, выберете как вы хотите настроить свои новости:"
             },
             "markup": {
-                "en": ["Manual", "Explore"]
+                "en": ["Manual", "Explore"],
+                "ru": ["Вручную", "Автоматически"]
             },
             "payload": ["set:2.1:manual", "set:2.2:explore"]
         },
 
         "2.1": {
             "text": {
-                "en": "<i>Manual Entry</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
+                "en": "<i>Manual Entry</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links.",
+                "ru": "<i>Ручной Ввод</i>\n\nОтлично! На данный момент мы поддерживаем телеграм каналы и RSS ленты. Для каналов, отправьте @username, а для RSS лент отправьте ссылку."
             },
             "markup": {
-                "en": ["« Back", "Done"]
+                "en": ["« Back", "Done"],
+                "ru": ["« Назад", "Закончить"]
             },
             "payload": ["set:2:back", "set:3:done"]
         },
 
         "2.1b": {
             "text": {
-                "en": "{} successfully added to your list of feeds."
+                "en": "{} successfully added to your list of feeds.",
+                "ru": "{} был добавлен в ваш список лент."
             },
             "markup": {
-                "en": ["Done"]
+                "en": ["Done"],
+                "ru": ["Закончить"]
             },
             "payload": ["set:3:done"]
         },
 
         "2.2": {
             "text": {
-                "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>"
+                "en": "<i>Explore</i>\n\nGreat! Send me a list of topics you'd like to see in your news feeds with a simple list of of words or phrases, each separated by a comma. For example:\n\n<code>US News, Astronomy, Telegram</code>",
+                "ru": "<i>Автоматический Ввод</i>\n\nОтлично! Пожалуйста отправьте список ваших интересов о которых вы бы хотели читать в новостях через запятую:\n\n<code>Путин, Астрология, Кулинария</code>"
             },
             "markup": {
-                "en": ["« Back", "Done"]
+                "en": ["« Back", "Done"],
+                "ru": ["« Назад", "Закончить"]
             },
             "payload": ["set:2:back", "set:3:done"]
         },
 
         "2.2b": {
             "text": {
-                "en": "Suggestions for channels and RSS feeds to follow have been compiled. Select which ones you'd like to follow by clicking the buttons below:"
+                "en": "Suggestions for channels and RSS feeds to follow have been compiled. Select which ones you'd like to follow by clicking the buttons below:",
+                "ru": "pass [ERROR]"
             }
         },
 
         "3": {
             "text": {
-                "en": "<i>Menu</i>\n\n<code>{rss_num:02} feeds</code>\n<code>{channel_num:02} channels</code>\n<code>{time}</code>"
+                "en": "<i>Menu</i>\n\n<code>{rss_num:02} feeds</code>\n<code>{channel_num:02} channels</code>\n<code>{time}</code>",
+                "ru": "<i>Menu</i>\n\n<code>{rss_num:02} лент</code>\n<code>{channel_num:02} каналов</code>\n<code>{time}</code>"
             },
             "markup": {
-                "en": ["✎ RSS", "✎ Channels", "General Settings"]
+                "en": ["✎ RSS", "✎ Channels", "General Settings"],
+                "ru": ["✎ RSS", "✎ Каналы", "Настройки"]
             },
             "payload": ["fin:3.1:rss", "fin:3.2:channels", "fin:3.3:general"]
         },
 
         "3.1": {
             "text": {
-                "en": "<i>Modify RSS</i>\n\nHow would you like to modify your RSS feeds?"
+                "en": "<i>Modify RSS</i>\n\nHow would you like to modify your RSS feeds?",
+                "ru": "<i>Изменение RSS лент</i>\n\nКак бы вы хотели изменить ваш список RSS лент?"
             },
             "markup": {
-                "en": ["« Back", "Delete"]
+                "en": ["« Back", "Delete"],
+                "ru": ["« Назад", "Удалить"]
             },
             "payload": ["fin:3:back", "fin:3.1.1:delete"]
         },
 
         "3.1.1": {
             "text": {
-                "en": "<i>Delete</i>\n\nPlease click on the RSS Feeds you'd like to unsubscribe from."
+                "en": "<i>Delete</i>\n\nPlease click on the RSS Feeds you'd like to unsubscribe from.",
+                "ru": "<i>Удаление</i>\n\nНажмите на RSS ленты которые вы хотите удалить с вашего списка."
             },
             "markup": {
-                "en": ["« Back"]
+                "en": ["« Back"],
+                "ru": ["« Назад"]
             },
             "payload": ["fin:3.1:back"]
         },
 
         "3.2": {
             "text": {
-                "en": "<i>Modify Channels</i>\n\nHow would you like to modify your Telegram Channels?"
+                "en": "<i>Modify Channels</i>\n\nHow would you like to modify your Telegram Channels?",
+                "ru": "<i>Изменение каналов</i>\n\nКак бы вы хотели изменить ваш список каналов"
             },
             "markup": {
-                "en": ["« Back", "Delete"]
+                "en": ["« Back", "Delete"],
+                "ru": ["« Назад", "Удалить"]
             },
             "payload": ["fin:3:back", "fin:3.2.1:delete"]
         },
 
         "3.2.1": {
             "text": {
-                "en": "<i>Delete</i>\n\nPlease click on the Channels you'd like to unsubscribe from."
+                "en": "<i>Delete</i>\n\nPlease click on the Channels you'd like to unsubscribe from.",
+                "ru": "<i>Удаление</i>\n\nНажмите на каналы которые вы хотите удалить с вашего списка."
             },
             "markup": {
-                "en": ["« Back"]
+                "en": ["« Back"],
+                "ru": ["« Назад"]
             },
             "payload": ["fin:3.2:back"]
         },
 
         "3.3": {
             "text": {
-                "en": "<i>General Settings</i>\n\nHow would you like to modify all of your feeds?"
+                "en": "<i>General Settings</i>\n\nHow would you like to modify all of your feeds?",
+                "ru": "<i>Настройки</i>\n\nКак бы вы хотели настроить все ваши ленты?"
             },
             "markup": {
-                "en": ["Add Feeds","« Back"]
+                "en": ["« Back", "Add Feeds"],
+                "ru": ["« Назад", "Добавить"]
             },
-            "payload": ["fin:3.3.1:add_feeds","fin:3:back"]
+            "payload": ["fin:3:back", "fin:3.3.1:add_feeds"]
         },
 
         "3.3.1": {
             "text": {
-                "en": "<i>Add Feeds</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links."
+                "en": "<i>Add Feeds</i>\n\nGreat! Currently we support Telegram Channels and RSS feeds. For channels, send a @username and for RSS feeds send corresponding links.",
+                "ru": "<i>Добавить ленты</i>\n\nОтлично! На данный момент мы поддерживаем телеграм каналы и RSS ленты. Для каналов, отправьте @username, а для RSS лент отправьте ссылку."
             },
             "markup": {
-                "en": ["« Back", "Done"]
+                "en": ["« Back", "Done"],
+                "ru": ["« Назад", "Закончить"]
             },
             "payload": ["fin:3.3:back", "fin:3.3:done"]
         },
 
         "3.3.1b": {
             "text": {
-                "en": "{} successfully added to your list of feeds."
+                "en": "{} successfully added to your list of feeds.",
+                "ru": "{} добавлен к вашему списку лент."
             },
             "markup": {
-                "en": ["Done"]
+                "en": ["Done"],
+                "ru": ["Закончить"]
             },
             "payload": ["fin:3.3:done"]
         }
