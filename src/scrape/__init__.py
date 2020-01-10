@@ -46,6 +46,6 @@ class Scraper:
             while True:
                 self.update_channels()
                 self.update_rss_feeds()
-                time.sleep(10)  # avoid floods
+                time.sleep(300)  # avoid floods
 
         Thread(target=_loop_run).start()

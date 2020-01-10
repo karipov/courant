@@ -17,7 +17,7 @@ from scrape import Scraper
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    level=logging.DEBUG
     )
 
 # set some config files and define them as objects
