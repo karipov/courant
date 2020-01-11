@@ -46,6 +46,23 @@ class Channel(Document):
             [self.title, self.description]
         )
 
+        if self.meta_info.fetched and not self.check_subscribed():
+            raise Exception(f"No subscribers but {self.username} fetched.")
+
+    def check_subscribed(self) -> bool:
+        """
+        Checks whether the channel has any subscribers
+
+        :return: True for yes, False for no.
+        """
+        try:
+            if len(self.subscribed) == 0:
+                return False
+        except TypeError:  # field might not exist
+            return False
+
+        return True
+
     @classmethod
     def get_channel(cls, id: int):
         """

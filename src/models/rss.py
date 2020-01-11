@@ -21,13 +21,13 @@ class RSS(Document):
     # cannot be removed
     title = StringField(required=True)
     title_ngrams = ListField(StringField(), default=list)
+    language = StringField(required=True, default=str)
     subtitle = StringField(default=str)
     summary = StringField(default=str)
-    language = StringField(default=str)
 
     last_entry_link = StringField(required=True, default=str)
 
-    subscribed = ListField(IntField(), default=list)
+    subscribed = ListField(IntField(), required=True, default=list)
 
     meta = {
         'indexes': [{
@@ -53,6 +53,9 @@ class RSS(Document):
             [self.title, self.subtitle, self.summary]
         )
 
+        if self.meta_info.fetched and not self.check_subscribed():
+            raise Exception(f"No subscribers but {self.title} fetched.")
+
     def check_subscription(self, uid: int) -> bool:
         """
         Checks whether an RSS feed has a given user in its subscription
@@ -61,6 +64,20 @@ class RSS(Document):
         :return: whether or not the the user is subscribed
         """
         return uid in self.subscribed
+
+    def check_subscribed(self) -> bool:
+        """
+        Checks whether RSS has any subscribers
+
+        :return: True for yes, False for no.
+        """
+        try:
+            if len(self.subscribed) == 0:
+                return False
+        except TypeError:  # field might not exist
+            return False
+
+        return True
 
     @classmethod
     def get_rss(cls, rss_link: str) -> RSS:
