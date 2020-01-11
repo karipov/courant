@@ -4,8 +4,8 @@ information from channels to users
 """
 import html
 
-from pyrogram.errors import BadRequest
-from telegram.error import Unauthorized
+from pyrogram.errors import BadRequest as PyroBadRequest
+from telegram.error import Unauthorized, BadRequest
 from pyrogram import Message
 
 from models import Channel, User
@@ -17,10 +17,12 @@ def update_channels(self):
     subscribed user and new post and sends the users the new info.
     """
     for resource in Channel.objects:
+        if not resource.meta_info.fetched:
+            continue
 
         try:
             posts = self._get_new_posts(resource)
-        except BadRequest:  # if username doesn't exist; invalid.
+        except PyroBadRequest:  # if username doesn't exist; invalid.
             for user_id in resource.subscribed:
                 user = User.get_user(user_id)
                 user_lang = user.settings.language
@@ -41,11 +43,15 @@ def update_channels(self):
                 data = self._filter_post(post)
                 exists = self._send_post(data, user_id)
 
-                if not exists:
-                    if user_id in resource.subscribed:
-                        resource.subscribed.remove(user_id)
+                if exists:
+                    continue
+                if user_id in resource.subscribed:
+                    resource.subscribed.remove(user_id)
                     resource.save()
-                    break
+                if resource.check_subscribed():
+                    resource.meta_info.fetched = False
+                    resource.save()
+                break
 
 
 def _filter_post(self, post: Message) -> dict:
@@ -108,7 +114,7 @@ def _send_post(self, info: dict, user_id: int) -> bool:
     # execute function with provided metadata
     try:
         info['method'](**info['metadata'])
-    except Unauthorized:  # if user blocked bot
+    except (Unauthorized, BadRequest):  # if user blocked bot or chat DNE
         try:
             User.get_user(user_id).delete()
             return False

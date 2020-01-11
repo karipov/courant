@@ -4,7 +4,7 @@ information from rss feeds to users
 """
 import html
 
-from telegram.error import Unauthorized
+from telegram.error import Unauthorized, BadRequest
 
 from models import RSS, User
 import utility
@@ -16,6 +16,9 @@ def update_rss_feeds(self):
     database and associated subscribed users to send them new articles.
     """
     for feed in RSS.objects:
+        if not feed.meta_info.fetched:
+            continue
+
         parsed = utility.parse_url(feed.rss_link)
 
         # even though a feed check is done when the it is added to the
@@ -48,11 +51,15 @@ def update_rss_feeds(self):
                         html.escape(entry.title), entry.link
                     ), user_id)
 
-                if not exists:
-                    if user_id in feed.subscribed:
-                        feed.subscribed.remove(user_id)
+                if exists:
+                    continue
+                if feed.check_subscription(user_id):
+                    feed.subscribed.remove(user_id)
                     feed.save()
-                    break
+                if not feed.check_subscribed():
+                    feed.meta_info.fetched = False
+                    feed.save()
+                break
 
 
 def _send_rss_message(self, text, chat_id) -> bool:
@@ -63,7 +70,7 @@ def _send_rss_message(self, text, chat_id) -> bool:
         self.bot.send_message(
             text, chat_id, parse_mode='HTML'
         )
-    except Unauthorized:
+    except (Unauthorized, BadRequest):
         try:
             User.get_user(chat_id).delete()
             return False
