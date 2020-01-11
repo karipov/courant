@@ -39,12 +39,14 @@ class User(Document):
     User class that contains all necessary information about individual users
     of the service.
     """
-    user_id = IntField(unique=True, required=True)
+    user_id = IntField(primary_key=True, unique=True, required=True)
     registered = DateTimeField(default=datetime.now)
     premium = BooleanField(required=True, default=False)
-    users_invited = ListField(IntField())
+    users_invited = ListField(IntField(), required=True, default=list)
     settings = EmbeddedDocumentField(Settings, required=True)
-    subscribed = EmbeddedDocumentField(Subscribed, default=Subscribed)
+    subscribed = EmbeddedDocumentField(
+        Subscribed, required=True, default=Subscribed
+    )
 
     meta = {
         'collection': 'users'
