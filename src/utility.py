@@ -7,7 +7,7 @@ import io
 import random
 
 import feedparser
-import pycld2
+import langdetect
 import requests
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -128,7 +128,7 @@ def gen_ngrams(text: str, min_size: int = 2, max_len: int = 120) -> list:
     size_range = range(min_size, max(length, min_size) + 1)
 
     n_grams = list(set(
-        text[i:i + size].strip()  # remove whitspace
+        text[i:i + size].strip()  # remove whitespace
         for size in size_range
         for i in range(0, max(0, length - size) + 1)
     ))
@@ -154,15 +154,9 @@ def detect_language(all_strings: list) -> str:
     ]
 
     total = ' '.join(all_strings)
+    code = langdetect.detect(total)
 
-    _, _, details = pycld2.detect(
-        total, isPlainText=True, bestEffort=True
-    )
-
-    lang_codes = [x[1] for x in details]
-    selected = [x for x in lang_codes if x in LANGUAGES]
-
-    try:
-        return selected[0]
-    except IndexError:
+    if code not in LANGUAGES:
         return 'none'
+
+    return code
