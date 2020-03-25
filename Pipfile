@@ -10,11 +10,11 @@ flake8 = "*"
 feedparser = "*"
 python-telegram-bot = "*"
 pyrogram = "*"
-mongoengine = "*"
 tgcrypto = "*"
 requests = "*"
 flake8 = "*"
-pycld2 = "*"
+mongoengine = "*"
+langdetect = "*"
 
 [requires]
 python_version = "3.7"
