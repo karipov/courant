@@ -1,31 +1,19 @@
-import datetime
+from __future__ import annotations
 
-from mongoengine import Document, EmbeddedDocument
-from mongoengine import IntField, ListField, DateTimeField, BooleanField
-from mongoengine import StringField, EmbeddedDocumentField
+from mongoengine import IntField, StringField
 
 import utility
+from .feed import Feed
 
 
-class MetaInfoChannel(EmbeddedDocument):
-    time_added = DateTimeField(default=datetime.datetime.utcnow)
-    fetched = BooleanField(required=True, default=True)
-
-
-class Channel(Document):
-    meta_info = EmbeddedDocumentField(MetaInfoChannel, default=MetaInfoChannel)
+class Channel(Feed):
     channel_id = IntField(unique=True, required=True)
     username = StringField(required=True)
 
     # cannot be removed
-    title = StringField(required=True, default=str)
-    title_ngrams = ListField(StringField(), default=list)
     description = StringField(required=True, default=str)
-    language = StringField(default=str)
 
     last_entry_id = IntField(required=True)
-
-    subscribed = ListField(IntField(), default=list)
 
     meta = {
         'indexes': [{
@@ -40,31 +28,14 @@ class Channel(Document):
         """
         Override
         """
-        self.title_ngrams = utility.gen_ngrams(self.title)
+        super().clean()
 
         self.language = utility.detect_language(
             [self.title, self.description]
         )
 
-        if self.meta_info.fetched and not self.check_subscribed():
-            raise Exception(f"No subscribers but {self.username} fetched.")
-
-    def check_subscribed(self) -> bool:
-        """
-        Checks whether the channel has any subscribers
-
-        :return: True for yes, False for no.
-        """
-        try:
-            if len(self.subscribed) == 0:
-                return False
-        except TypeError:  # field might not exist
-            return False
-
-        return True
-
     @classmethod
-    def get_channel(cls, id: int):
+    def get_channel(cls, id: int) -> Channel:
         """
         Retrieve a single channel given its id.
 
