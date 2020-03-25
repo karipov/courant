@@ -1,10 +1,12 @@
 from __future__ import annotations
+from datetime import datetime
 
 from mongoengine import Document
 from mongoengine import IntField, DateTimeField, ListField, StringField
 from mongoengine import BooleanField, EmbeddedDocument, EmbeddedDocumentField
-from mongoengine import ReferenceField
-from datetime import datetime
+from mongoengine import ReferenceField, LazyReferenceField
+from mongoengine import PULL
+
 
 # TODO: add further constriants, e.g. max_length
 
@@ -13,7 +15,7 @@ class Settings(EmbeddedDocument):
     """
     Sub-document containgin User settings data.
     """
-    language = StringField(required=True)
+    language = StringField(default='en', required=True)
     fsm_state = StringField(default='0', regex="(\\d\\.)*\\d")
     last_msg_id = IntField()
 
@@ -39,10 +41,13 @@ class User(Document):
     User class that contains all necessary information about individual users
     of the service.
     """
-    user_id = IntField(primary_key=True, unique=True, required=True)
+    user_id = IntField(required=True, unique=True)
     registered = DateTimeField(default=datetime.now)
     premium = BooleanField(required=True, default=False)
-    users_invited = ListField(IntField(), required=True, default=list)
+    users_invited = ListField(
+        LazyReferenceField('User', reverse_delete_rule=PULL),
+        default=list
+    )
     settings = EmbeddedDocumentField(Settings, required=True)
     subscribed = EmbeddedDocumentField(
         Subscribed, required=True, default=Subscribed
