@@ -4,17 +4,10 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-flake8 = "*"
 
 [packages]
-feedparser = "*"
-python-telegram-bot = "*"
-pyrogram = "*"
-tgcrypto = "*"
-requests = "*"
-flake8 = "*"
-mongoengine = "*"
-langdetect = "*"
+telethon = "*"
+cryptg = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.8"

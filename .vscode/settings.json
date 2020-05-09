@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "/Users/komron/.local/share/virtualenvs/courant-Dv7-v42z/bin/python",
-    "python.linting.pylintEnabled": false,
-    "python.linting.flake8Enabled": true,
-    "python.linting.enabled": true,
-    "editor.rulers": [79],
-    "editor.emptySelectionClipboard": false
-}
