@@ -1,0 +1,17 @@
+{
+    "TELETHON": {
+        "API_ID": < mtproto id >,
+        "API_HASH": "< mtproto hash >",
+        "TOKEN": "< botfather token >",
+        "TOKEN_DEV": "< botfather dev bot token >",
+        "SESSION": "src/client/telethon"
+    },
+
+    "LOG": {
+        "DEBUG": "logs/debug.log",
+        "INFO": "logs/info.log",
+        "ERR": "logs/error.log"
+    },
+
+    "ADMINS": [< telegram user id>]
+}
